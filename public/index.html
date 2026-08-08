@@ -52,10 +52,6 @@
       outline: none;
     }
 
-    input[type="text"]:focus {
-      border-color: var(--primary);
-    }
-
     button {
       padding: 12px 20px;
       background-color: var(--primary);
@@ -64,14 +60,8 @@
       border-radius: 6px;
       font-size: 1rem;
       cursor: pointer;
-      transition: background 0.2s;
     }
 
-    button:hover {
-      background-color: #0b5ed7;
-    }
-
-    /* Línea de tiempo (Timeline) */
     .timeline {
       position: relative;
       padding-left: 25px;
@@ -97,7 +87,6 @@
       box-shadow: 0 0 0 2px var(--primary);
     }
 
-    /* Badges de Estados con Colores */
     .badge {
       display: inline-block;
       padding: 5px 12px;
@@ -107,28 +96,23 @@
       margin-bottom: 6px;
     }
 
-    .badge-success { background-color: #d1e7dd; color: #0f5132; }  /* Verde: ENTREGADO */
-    .badge-info { background-color: #cff4fc; color: #055160; }     /* Azul: TRANSITO / REPARTO */
-    .badge-warning { background-color: #fff3cd; color: #664d03; }  /* Amarillo/Naranja: DESPACHADO */
-    .badge-danger { background-color: #f8d7da; color: #842029; }   /* Rojo: NOVEDAD */
-    .badge-default { background-color: #e2e3e5; color: #41464b; }  /* Gris: Otros */
+    .badge-success { background-color: #d1e7dd; color: #0f5132; }
+    .badge-info { background-color: #cff4fc; color: #055160; }
+    .badge-warning { background-color: #fff3cd; color: #664d03; }
+    .badge-danger { background-color: #f8d7da; color: #842029; }
+    .badge-default { background-color: #e2e3e5; color: #41464b; }
 
-    .location {
-      font-weight: 600;
-      font-size: 1.05rem;
-      margin: 2px 0;
-    }
+    .location { font-weight: 600; font-size: 1.05rem; margin: 2px 0; }
+    .notes { color: #6c757d; font-size: 0.95rem; margin-top: 4px; }
+    .date { font-size: 0.8rem; color: #adb5bd; margin-top: 4px; }
 
-    .notes {
-      color: #6c757d;
-      font-size: 0.95rem;
-      margin-top: 4px;
-    }
-
-    .date {
-      font-size: 0.8rem;
-      color: #adb5bd;
-      margin-top: 4px;
+    .foto-cumplido {
+      margin-top: 10px;
+      max-width: 100%;
+      max-height: 250px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
     .alert {
@@ -147,10 +131,6 @@
       font-size: 0.9rem;
       text-decoration: none;
     }
-
-    .admin-link:hover {
-      text-decoration: underline;
-    }
   </style>
 </head>
 <body>
@@ -159,7 +139,7 @@
     <h1>🚀 Consulta de Trazabilidad</h1>
     
     <div class="search-box">
-      <input type="text" id="guiaInput" placeholder="Ejemplo: PDS-2026-001" value="PDS-2026-001">
+      <input type="text" id="guiaInput" placeholder="Ejemplo: 16581" value="16581">
       <button onclick="buscarGuia()">Consultar</button>
     </div>
 
@@ -172,12 +152,10 @@
     function obtenerClaseBadge(estado) {
       if (!estado) return 'badge-default';
       const est = estado.toUpperCase();
-      
       if (est.includes('ENTREGADO')) return 'badge-success';
       if (est.includes('TRANSITO') || est.includes('REPARTO')) return 'badge-info';
       if (est.includes('DESPACHADO')) return 'badge-warning';
-      if (est.includes('NOVEDAD') || est.includes('ERROR') || est.includes('RECHAZADO')) return 'badge-danger';
-      
+      if (est.includes('NOVEDAD') || est.includes('ERROR')) return 'badge-danger';
       return 'badge-default';
     }
 
@@ -210,12 +188,14 @@
         data.forEach(evento => {
           const fecha = evento.fecha_reporte ? new Date(evento.fecha_reporte).toLocaleString('es-CO') : 'Sin fecha';
           const badgeClass = obtenerClaseBadge(evento.estado_envio);
+          const fotoHtml = evento.foto_url ? `<br><img src="${evento.foto_url}" class="foto-cumplido" alt="Evidencia Fotográfica">` : '';
 
           html += `
             <div class="timeline-event">
               <span class="badge ${badgeClass}">${evento.estado_envio}</span>
               <div class="location">📍 ${evento.ubicacion}</div>
               <div class="notes">${evento.notas || ''}</div>
+              ${fotoHtml}
               <div class="date">🕒 ${fecha}</div>
             </div>
           `;
@@ -229,7 +209,6 @@
       }
     }
 
-    // Cargar automáticamente al abrir la página
     window.onload = buscarGuia;
   </script>
 </body>

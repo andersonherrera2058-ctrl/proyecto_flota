@@ -3,192 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Administración - Registro de Trazabilidad</title>
+  <title>Administración - Actualizar Envío</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      color: #212529;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 550px;
-      margin: 30px auto;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-
-    h1 {
-      text-align: center;
-      color: #0d6efd;
-      margin-bottom: 20px;
-      font-size: 1.6rem;
-    }
-
-    .form-group {
-      margin-bottom: 18px;
-    }
-
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 6px;
-      font-size: 0.95rem;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #dee2e6;
-      border-radius: 6px;
-      font-size: 0.95rem;
-      box-sizing: border-box;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #0d6efd;
-      outline: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #198754;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    button:hover {
-      background-color: #157347;
-    }
-
-    .alert {
-      margin-top: 20px;
-      padding: 12px;
-      border-radius: 6px;
-      text-align: center;
-      display: none;
-      font-size: 0.95rem;
-    }
-
-    .alert-success {
-      background-color: #d1e7dd;
-      color: #0f5132;
-    }
-
-    .alert-danger {
-      background-color: #f8d7da;
-      color: #842029;
-    }
-
-    .nav-link {
-      display: block;
-      text-align: center;
-      margin-top: 15px;
-      color: #0d6efd;
-      text-decoration: none;
-      font-weight: 600;
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+    .card { max-width: 500px; margin: 20px auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #0d6efd; margin-bottom: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { font-weight: 600; display: block; margin-bottom: 5px; font-size: 0.9rem; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+    button { width: 100%; padding: 12px; background-color: #198754; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    button:hover { background-color: #146c43; }
+    .alert { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; font-weight: 500; }
+    .alert-success { background-color: #d1e7dd; color: #0f5132; }
+    .alert-danger { background-color: #f8d7da; color: #842029; }
+    #previewImg { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-top: 10px; display: none; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>📦 Actualizar Estado de Guía</h1>
-
-    <form id="trackingForm">
+  <div class="card">
+    <h2>📦 Actualizar Estado de Guía</h2>
+    <form id="adminForm">
       <div class="form-group">
-        <label for="guia">Número de Guía:</label>
-        <input type="text" id="guia" value="PDS-2026-001" required>
+        <label>Número de Guía:</label>
+        <input type="text" id="guia" placeholder="Ejemplo: 16581 o PDS-2026-001" required>
       </div>
 
       <div class="form-group">
-        <label for="estado">Estado del Envío:</label>
+        <label>Estado del Envío:</label>
         <select id="estado" required>
+          <option value="DESPACHADO">DESPACHADO</option>
           <option value="EN_TRANSITO">EN TRANSITO</option>
           <option value="EN_REPARTO">EN REPARTO</option>
-          <option value="ENTREGADO">ENTREGADO</option>
-          <option value="NOVEDAD">NOVEDAD EN RUTA</option>
+          <option value="ENTREGADO">ENTREGADO (CUMPLIDO)</option>
+          <option value="NOVEDAD">NOVEDAD / RETRASO</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="ubicacion">Ubicación Actual:</label>
-        <input type="text" id="ubicacion" placeholder="Ejemplo: Centro de Distribución Bogotá" required>
+        <label>Ubicación Actual:</label>
+        <input type="text" id="ubicacion" placeholder="Ejemplo: Bodega Principal Bogotá" required>
       </div>
 
       <div class="form-group">
-        <label for="notas">Notas u Observaciones:</label>
-        <textarea id="notas" rows="3" placeholder="Ejemplo: Paquete asignado al vehículo N° 42"></textarea>
+        <label>Notas u Observaciones:</label>
+        <textarea id="notas" rows="3" placeholder="Información del conductor o novedad..."></textarea>
       </div>
 
       <div class="form-group">
-        <label for="apiKey">Clave API de Autorización:</label>
-        <input type="password" id="apiKey" placeholder="Ingresa la FREIGHT_API_KEY del .env" required>
+        <label>📸 Registro Fotográfico / Cumplido (Opcional):</label>
+        <!-- capture="environment" abre directamente la cámara trasera en móviles -->
+        <input type="file" id="fotoInput" accept="image/*" capture="environment" onchange="mostrarVistaPrevia()">
+        <img id="previewImg" alt="Vista previa del cumplido">
+      </div>
+
+      <div class="form-group">
+        <label>Clave API de Autorización:</label>
+        <input type="password" id="apiKey" value="aliado_carga_prodeseg_2026" required>
       </div>
 
       <button type="submit">Registrar Evento</button>
     </form>
 
-    <div id="mensaje" class="alert"></div>
-
-    <a href="/" class="nav-link">← Ir a la vista pública de consulta</a>
+    <div id="mensaje"></div>
+    <p style="text-align: center; margin-top: 15px;"><a href="/">← Volver a la Consulta Pública</a></p>
   </div>
 
   <script>
-    document.getElementById('trackingForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    let fotoBase64 = null;
 
+    function mostrarVistaPrevia() {
+      const file = document.getElementById('fotoInput').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          fotoBase64 = e.target.result;
+          const img = document.getElementById('previewImg');
+          img.src = fotoBase64;
+          img.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    document.getElementById('adminForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
       const mensajeDiv = document.getElementById('mensaje');
-      mensajeDiv.style.display = 'none';
+      mensajeDiv.innerHTML = '<p style="text-align:center;">Guardando registro...</p>';
 
       const payload = {
-        guia_transporte: document.getElementById('guia').value.trim(),
+        numero_guia: document.getElementById('guia').value,
         estado_envio: document.getElementById('estado').value,
-        ubicacion: document.getElementById('ubicacion').value.trim(),
-        notas: document.getElementById('notas').value.trim()
+        ubicacion: document.getElementById('ubicacion').value,
+        notas: document.getElementById('notas').value,
+        foto_url: fotoBase64,
+        api_key: document.getElementById('apiKey').value
       };
 
-      const apiKey = document.getElementById('apiKey').value.trim();
-
       try {
-        const response = await fetch('/api/open-tracking/update', {
+        const res = await fetch('/api/tracking', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-freight-partner-key': apiKey
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
-        const result = await response.json();
+        const data = await res.json();
 
-        if (response.ok && result.exito) {
-          mensajeDiv.className = 'alert alert-success';
-          mensajeDiv.textContent = '✅ Evento registrado exitosamente en la base de datos.';
-          mensajeDiv.style.display = 'block';
-          
-          // Limpiar ubicacion y notas
-          document.getElementById('ubicacion').value = '';
-          document.getElementById('notas').value = '';
+        if (res.ok && data.success) {
+          mensajeDiv.innerHTML = '<div class="alert alert-success">✅ Registro guardado exitosamente.</div>';
+          document.getElementById('adminForm').reset();
+          document.getElementById('previewImg').style.display = 'none';
+          fotoBase64 = null;
         } else {
-          mensajeDiv.className = 'alert alert-danger';
-          mensajeDiv.textContent = `❌ Error: ${result.error || 'No autorizado o datos inválidos.'}`;
-          mensajeDiv.style.display = 'block';
+          mensajeDiv.innerHTML = `<div class="alert alert-danger">❌ Error: ${data.error}</div>`;
         }
       } catch (err) {
-        mensajeDiv.className = 'alert alert-danger';
-        mensajeDiv.textContent = `❌ Error de conexión: ${err.message}`;
-        mensajeDiv.style.display = 'block';
+        mensajeDiv.innerHTML = `<div class="alert alert-danger">❌ Error de conexión: ${err.message}</div>`;
       }
     });
   </script>
