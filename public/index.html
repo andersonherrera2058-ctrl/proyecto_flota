@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trazabilidad de Envíos - Prodeseg</title>
+  <style>
+    :root {
+      --primary: #0d6efd;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text: #212529;
+      --border: #dee2e6;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 40px auto;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      color: #0b5ed7;
+      margin-bottom: 25px;
+      font-size: 1.8rem;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      padding: 12px 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #0b5ed7;
+    }
+
+    /* Línea de tiempo (Timeline) */
+    .timeline {
+      position: relative;
+      padding-left: 25px;
+      border-left: 3px solid var(--border);
+      margin-top: 20px;
+    }
+
+    .timeline-event {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    .timeline-event::before {
+      content: '';
+      position: absolute;
+      left: -32px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+
+    /* Badges de Estados con Colores */
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .badge-success { background-color: #d1e7dd; color: #0f5132; }  /* Verde: ENTREGADO */
+    .badge-info { background-color: #cff4fc; color: #055160; }     /* Azul: TRANSITO / REPARTO */
+    .badge-warning { background-color: #fff3cd; color: #664d03; }  /* Amarillo/Naranja: DESPACHADO */
+    .badge-danger { background-color: #f8d7da; color: #842029; }   /* Rojo: NOVEDAD */
+    .badge-default { background-color: #e2e3e5; color: #41464b; }  /* Gris: Otros */
+
+    .location {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin: 2px 0;
+    }
+
+    .notes {
+      color: #6c757d;
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    .date {
+      font-size: 0.8rem;
+      color: #adb5bd;
+      margin-top: 4px;
+    }
+
+    .alert {
+      padding: 15px;
+      background-color: #f8d7da;
+      color: #842029;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .admin-link {
+      display: block;
+      text-align: center;
+      margin-top: 25px;
+      color: #6c757d;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    .admin-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🚀 Consulta de Trazabilidad</h1>
+    
+    <div class="search-box">
+      <input type="text" id="guiaInput" placeholder="Ejemplo: PDS-2026-001" value="PDS-2026-001">
+      <button onclick="buscarGuia()">Consultar</button>
+    </div>
+
+    <div id="resultado"></div>
+
+    <a href="/admin.html" class="admin-link">⚙️ Acceso Administrador (Actualizar Envío)</a>
+  </div>
+
+  <script>
+    function obtenerClaseBadge(estado) {
+      if (!estado) return 'badge-default';
+      const est = estado.toUpperCase();
+      
+      if (est.includes('ENTREGADO')) return 'badge-success';
+      if (est.includes('TRANSITO') || est.includes('REPARTO')) return 'badge-info';
+      if (est.includes('DESPACHADO')) return 'badge-warning';
+      if (est.includes('NOVEDAD') || est.includes('ERROR') || est.includes('RECHAZADO')) return 'badge-danger';
+      
+      return 'badge-default';
+    }
+
+    async function buscarGuia() {
+      const guia = document.getElementById('guiaInput').value.trim();
+      const resultadoDiv = document.getElementById('resultado');
+
+      if (!guia) {
+        resultadoDiv.innerHTML = '<div class="alert">Por favor ingresa un número de guía.</div>';
+        return;
+      }
+
+      resultadoDiv.innerHTML = '<p style="text-align:center;">Cargando trazabilidad...</p>';
+
+      try {
+        const response = await fetch(`/api/tracking/${guia}`);
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          resultadoDiv.innerHTML = `<div class="alert">Error: ${data.error || 'No se pudo obtener la información.'}</div>`;
+          return;
+        }
+
+        if (data.length === 0) {
+          resultadoDiv.innerHTML = '<div class="alert">No se encontraron eventos para esta guía.</div>';
+          return;
+        }
+
+        let html = '<div class="timeline">';
+        data.forEach(evento => {
+          const fecha = evento.fecha_reporte ? new Date(evento.fecha_reporte).toLocaleString('es-CO') : 'Sin fecha';
+          const badgeClass = obtenerClaseBadge(evento.estado_envio);
+
+          html += `
+            <div class="timeline-event">
+              <span class="badge ${badgeClass}">${evento.estado_envio}</span>
+              <div class="location">📍 ${evento.ubicacion}</div>
+              <div class="notes">${evento.notas || ''}</div>
+              <div class="date">🕒 ${fecha}</div>
+            </div>
+          `;
+        });
+        html += '</div>';
+
+        resultadoDiv.innerHTML = html;
+
+      } catch (err) {
+        resultadoDiv.innerHTML = `<div class="alert">Error de conexión: ${err.message}</div>`;
+      }
+    }
+
+    // Cargar automáticamente al abrir la página
+    window.onload = buscarGuia;
+  </script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración - Registro de Trazabilidad</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #212529;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 550px;
+      margin: 30px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d6efd;
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #0d6efd;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #198754;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #157347;
+    }
+
+    .alert {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      display: none;
+      font-size: 0.95rem;
+    }
+
+    .alert-success {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #842029;
+    }
+
+    .nav-link {
+      display: block;
+      text-align: center;
+      margin-top: 15px;
+      color: #0d6efd;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>📦 Actualizar Estado de Guía</h1>
+
+    <form id="trackingForm">
+      <div class="form-group">
+        <label for="guia">Número de Guía:</label>
+        <input type="text" id="guia" value="PDS-2026-001" required>
+      </div>
+
+      <div class="form-group">
+        <label for="estado">Estado del Envío:</label>
+        <select id="estado" required>
+          <option value="EN_TRANSITO">EN TRANSITO</option>
+          <option value="EN_REPARTO">EN REPARTO</option>
+          <option value="ENTREGADO">ENTREGADO</option>
+          <option value="NOVEDAD">NOVEDAD EN RUTA</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="ubicacion">Ubicación Actual:</label>
+        <input type="text" id="ubicacion" placeholder="Ejemplo: Centro de Distribución Bogotá" required>
+      </div>
+
+      <div class="form-group">
+        <label for="notas">Notas u Observaciones:</label>
+        <textarea id="notas" rows="3" placeholder="Ejemplo: Paquete asignado al vehículo N° 42"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="apiKey">Clave API de Autorización:</label>
+        <input type="password" id="apiKey" placeholder="Ingresa la FREIGHT_API_KEY del .env" required>
+      </div>
+
+      <button type="submit">Registrar Evento</button>
+    </form>
+
+    <div id="mensaje" class="alert"></div>
+
+    <a href="/" class="nav-link">← Ir a la vista pública de consulta</a>
+  </div>
+
+  <script>
+    document.getElementById('trackingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const mensajeDiv = document.getElementById('mensaje');
+      mensajeDiv.style.display = 'none';
+
+      const payload = {
+        guia_transporte: document.getElementById('guia').value.trim(),
+        estado_envio: document.getElementById('estado').value,
+        ubicacion: document.getElementById('ubicacion').value.trim(),
+        notas: document.getElementById('notas').value.trim()
+      };
+
+      const apiKey = document.getElementById('apiKey').value.trim();
+
+      try {
+        const response = await fetch('/api/open-tracking/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-freight-partner-key': apiKey
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.exito) {
+          mensajeDiv.className = 'alert alert-success';
+          mensajeDiv.textContent = '✅ Evento registrado exitosamente en la base de datos.';
+          mensajeDiv.style.display = 'block';
+          
+          // Limpiar ubicacion y notas
+          document.getElementById('ubicacion').value = '';
+          document.getElementById('notas').value = '';
+        } else {
+          mensajeDiv.className = 'alert alert-danger';
+          mensajeDiv.textContent = `❌ Error: ${result.error || 'No autorizado o datos inválidos.'}`;
+          mensajeDiv.style.display = 'block';
+        }
+      } catch (err) {
+        mensajeDiv.className = 'alert alert-danger';
+        mensajeDiv.textContent = `❌ Error de conexión: ${err.message}`;
+        mensajeDiv.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
