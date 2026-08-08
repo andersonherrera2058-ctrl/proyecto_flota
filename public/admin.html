@@ -3,37 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Administración - Actualizar Envío</title>
+  <title>Registro de Entrega y Estado - Conductores</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
-    .card { max-width: 500px; margin: 20px auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    h2 { text-align: center; color: #0d6efd; margin-bottom: 20px; }
-    .form-group { margin-bottom: 15px; }
-    label { font-weight: 600; display: block; margin-bottom: 5px; font-size: 0.9rem; }
-    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
-    button { width: 100%; padding: 12px; background-color: #198754; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 15px; }
+    .card { max-width: 500px; margin: 10px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #0d6efd; margin-top: 0; margin-bottom: 20px; font-size: 1.4rem; }
+    .form-group { margin-bottom: 18px; }
+    label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.95rem; color: #333; }
+    input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+    button { width: 100%; padding: 14px; background-color: #198754; color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
     button:hover { background-color: #146c43; }
-    .alert { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; font-weight: 500; }
+    .alert { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; }
     .alert-success { background-color: #d1e7dd; color: #0f5132; }
     .alert-danger { background-color: #f8d7da; color: #842029; }
-    #previewImg { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-top: 10px; display: none; }
+    #previewImg { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #ddd; }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h2>📦 Actualizar Estado de Guía</h2>
+    <h2>🚚 Registro de Estado / Cumplido</h2>
     <form id="adminForm">
       <div class="form-group">
         <label>Número de Guía:</label>
-        <input type="text" id="guia" placeholder="Ejemplo: 16581 o PDS-2026-001" required>
+        <input type="text" id="guia" placeholder="Ingresa número de guía (ej. 16581)" required>
       </div>
 
       <div class="form-group">
         <label>Estado del Envío:</label>
         <select id="estado" required>
           <option value="DESPACHADO">DESPACHADO</option>
-          <option value="EN_TRANSITO">EN TRANSITO</option>
+          <option value="EN_TRANSITO">EN TRÁNSITO</option>
           <option value="EN_REPARTO">EN REPARTO</option>
           <option value="ENTREGADO">ENTREGADO (CUMPLIDO)</option>
           <option value="NOVEDAD">NOVEDAD / RETRASO</option>
@@ -42,31 +42,24 @@
 
       <div class="form-group">
         <label>Ubicación Actual:</label>
-        <input type="text" id="ubicacion" placeholder="Ejemplo: Bodega Principal Bogotá" required>
+        <input type="text" id="ubicacion" placeholder="Ej. Municipio / Bodega / Punto de entrega" required>
       </div>
 
       <div class="form-group">
         <label>Notas u Observaciones:</label>
-        <textarea id="notas" rows="3" placeholder="Información del conductor o novedad..."></textarea>
+        <textarea id="notas" rows="3" placeholder="Placa de vehículo, novedad o persona que recibe..."></textarea>
       </div>
 
       <div class="form-group">
-        <label>📸 Registro Fotográfico / Cumplido (Opcional):</label>
-        <!-- capture="environment" abre directamente la cámara trasera en móviles -->
+        <label>📸 Foto del Cumplido / Remisión:</label>
         <input type="file" id="fotoInput" accept="image/*" capture="environment" onchange="mostrarVistaPrevia()">
-        <img id="previewImg" alt="Vista previa del cumplido">
-      </div>
-
-      <div class="form-group">
-        <label>Clave API de Autorización:</label>
-        <input type="password" id="apiKey" value="aliado_carga_prodeseg_2026" required>
+        <img id="previewImg" alt="Vista previa de la foto">
       </div>
 
       <button type="submit">Registrar Evento</button>
     </form>
 
     <div id="mensaje"></div>
-    <p style="text-align: center; margin-top: 15px;"><a href="/">← Volver a la Consulta Pública</a></p>
   </div>
 
   <script>
@@ -89,15 +82,14 @@
     document.getElementById('adminForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const mensajeDiv = document.getElementById('mensaje');
-      mensajeDiv.innerHTML = '<p style="text-align:center;">Guardando registro...</p>';
+      mensajeDiv.innerHTML = '<p style="text-align:center;">Enviando registro...</p>';
 
       const payload = {
         numero_guia: document.getElementById('guia').value,
         estado_envio: document.getElementById('estado').value,
         ubicacion: document.getElementById('ubicacion').value,
         notas: document.getElementById('notas').value,
-        foto_url: fotoBase64,
-        api_key: document.getElementById('apiKey').value
+        foto_url: fotoBase64
       };
 
       try {
@@ -110,7 +102,7 @@
         const data = await res.json();
 
         if (res.ok && data.success) {
-          mensajeDiv.innerHTML = '<div class="alert alert-success">✅ Registro guardado exitosamente.</div>';
+          mensajeDiv.innerHTML = '<div class="alert alert-success">✅ Evento registrado exitosamente.</div>';
           document.getElementById('adminForm').reset();
           document.getElementById('previewImg').style.display = 'none';
           fotoBase64 = null;

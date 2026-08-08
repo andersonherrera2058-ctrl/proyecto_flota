@@ -23,7 +23,7 @@
 
     .container {
       max-width: 650px;
-      margin: 40px auto;
+      margin: 30px auto;
       background: var(--card-bg);
       padding: 30px;
       border-radius: 12px;
@@ -47,7 +47,7 @@
       flex: 1;
       padding: 12px 15px;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 1rem;
       outline: none;
     }
@@ -57,9 +57,10 @@
       background-color: var(--primary);
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 1rem;
       cursor: pointer;
+      font-weight: bold;
     }
 
     .timeline {
@@ -109,7 +110,7 @@
     .foto-cumplido {
       margin-top: 10px;
       max-width: 100%;
-      max-height: 250px;
+      max-height: 280px;
       border-radius: 8px;
       border: 1px solid var(--border);
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -119,17 +120,8 @@
       padding: 15px;
       background-color: #f8d7da;
       color: #842029;
-      border-radius: 6px;
+      border-radius: 8px;
       text-align: center;
-    }
-
-    .admin-link {
-      display: block;
-      text-align: center;
-      margin-top: 25px;
-      color: #6c757d;
-      font-size: 0.9rem;
-      text-decoration: none;
     }
   </style>
 </head>
@@ -139,13 +131,11 @@
     <h1>🚀 Consulta de Trazabilidad</h1>
     
     <div class="search-box">
-      <input type="text" id="guiaInput" placeholder="Ejemplo: 16581" value="16581">
+      <input type="text" id="guiaInput" placeholder="Ingresa tu número de guía" value="16581">
       <button onclick="buscarGuia()">Consultar</button>
     </div>
 
     <div id="resultado"></div>
-
-    <a href="/admin.html" class="admin-link">⚙️ Acceso Administrador (Actualizar Envío)</a>
   </div>
 
   <script>
@@ -180,7 +170,7 @@
         }
 
         if (data.length === 0) {
-          resultadoDiv.innerHTML = '<div class="alert">No se encontraron eventos para esta guía.</div>';
+          resultadoDiv.innerHTML = '<div class="alert">No se encontraron eventos registrados para esta guía.</div>';
           return;
         }
 
