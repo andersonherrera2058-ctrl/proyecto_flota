@@ -6,7 +6,6 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuración de Middlewares (soporte para imágenes pesadas en base64)
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ limit: '15mb', extended: true }));
@@ -17,70 +16,54 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// Inicialización flexible de Base de Datos
+// Inicialización de base de datos
 async function initDB() {
   try {
-    // 1. Crear tabla guias si no existe
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS guias (
-        numero_guia VARCHAR(50) PRIMARY KEY,
-        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    // 2. Crear tabla historial_trazabilidad si no existe
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS historial_trazabilidad (
-        id SERIAL PRIMARY KEY,
-        guia_transporte VARCHAR(50),
-        estado_envio VARCHAR(50) NOT NULL,
-        ubicacion VARCHAR(100) NOT NULL,
-        notas TEXT,
-        foto_url TEXT,
-        fecha_reporte TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    // 3. Garantizar que la columna foto_url exista siempre
+    // 1. Eliminar la restricción Foreign Key si existía para permitir guías arbitrarias
     await pool.query(`
       ALTER TABLE historial_trazabilidad 
-      ADD COLUMN IF NOT EXISTS foto_url TEXT;
+      DROP CONSTRAINT IF EXISTS historial_trazabilidad_guia_transporte_fkey;
     `);
 
-    console.log('✅ Base de datos inicializada y verificada con éxito.');
+    // 2. Intentar cambiar o asegurar columnas como VARCHAR/TEXT
+    await pool.query(`
+      ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS guia_transporte VARCHAR(50);
+      ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS numero_guia VARCHAR(50);
+      ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS foto_url TEXT;
+    `);
+
+    console.log('✅ Base de datos reconfigurada correctamente.');
   } catch (err) {
-    console.error('❌ Error al inicializar la base de datos:', err.message);
+    console.error('⚠️ Aviso en reconfiguración de BD:', err.message);
   }
 }
 initDB();
 
-// GET: Consultar trazabilidad de una guía
+// GET: Consultar trazabilidad (Soporta números puros 16581 y alfanuméricos PDS-2026-001)
 app.get('/api/tracking/:guia', async (req, res) => {
   const { guia } = req.params;
   const guiaLimpia = guia.trim();
+
   try {
-    // Intenta buscar por numero_guia o guia_transporte según la columna que exista
+    // Convertimos las columnas a TEXT explícitamente (::TEXT) para evitar errores de tipo si alguna es INTEGER
     const result = await pool.query(
       `SELECT * FROM historial_trazabilidad 
-       WHERE UPPER(COALESCE(
-         CASE WHEN EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='historial_trazabilidad' AND column_name='numero_guia') THEN numero_guia ELSE NULL END,
-         CASE WHEN EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='historial_trazabilidad' AND column_name='guia_transporte') THEN guia_transporte ELSE NULL END
-       )) = UPPER($1) 
+       WHERE UPPER(COALESCE(guia_transporte::TEXT, numero_guia::TEXT, '')) = UPPER($1)
+          OR UPPER(COALESCE(numero_guia::TEXT, guia_transporte::TEXT, '')) = UPPER($1)
        ORDER BY fecha_reporte DESC`,
       [guiaLimpia]
     );
     res.json(result.rows);
   } catch (err) {
-    console.error('Error en GET /api/tracking:', err.message);
-    res.status(500).json({ error: 'Error al consultar la trazabilidad' });
+    console.error('❌ Error en GET /api/tracking:', err.message);
+    res.status(500).json({ error: `Error al consultar trazabilidad: ${err.message}` });
   }
 });
 
-// POST: Registrar nuevo evento + foto del cumplido
+// POST: Registrar nuevo evento + foto (Compatible con cualquier tipo de guía)
 app.post('/api/tracking', async (req, res) => {
   const { numero_guia, estado_envio, ubicacion, notas, foto_url, api_key } = req.body;
 
-  // Validación de clave de autorización flexible
   const claveEsperada = (process.env.FREIGHT_API_KEY || 'aliado_carga_prodeseg_2026').trim();
   const claveRecibida = (api_key || '').trim();
 
@@ -95,44 +78,21 @@ app.post('/api/tracking', async (req, res) => {
   try {
     const guiaLimpia = numero_guia.trim();
 
-    // 1. Insertar la guía en la tabla principal si no existe
+    // Insertar intentando llenar ambas columnas para máxima compatibilidad
     await pool.query(
-      `INSERT INTO guias (numero_guia) VALUES ($1) ON CONFLICT (numero_guia) DO NOTHING`,
-      [guiaLimpia]
+      `INSERT INTO historial_trazabilidad (guia_transporte, numero_guia, estado_envio, ubicacion, notas, foto_url) 
+       VALUES ($1, $1, $2, $3, $4, $5)`,
+      [guiaLimpia, estado_envio, ubicacion, notas || null, foto_url || null]
     );
-
-    // 2. Detectar qué columnas existen en la tabla historial_trazabilidad
-    const colCheck = await pool.query(`
-      SELECT column_name 
-      FROM information_schema.columns 
-      WHERE table_name = 'historial_trazabilidad'
-    `);
-    const columnas = colCheck.rows.map(r => r.column_name);
-
-    let queryInsert = '';
-    let valores = [];
-
-    if (columnas.includes('numero_guia') && columnas.includes('guia_transporte')) {
-      queryInsert = `INSERT INTO historial_trazabilidad (numero_guia, guia_transporte, estado_envio, ubicacion, notas, foto_url) VALUES ($1, $1, $2, $3, $4, $5)`;
-      valores = [guiaLimpia, estado_envio, ubicacion, notas || null, foto_url || null];
-    } else if (columnas.includes('guia_transporte')) {
-      queryInsert = `INSERT INTO historial_trazabilidad (guia_transporte, estado_envio, ubicacion, notas, foto_url) VALUES ($1, $2, $3, $4, $5)`;
-      valores = [guiaLimpia, estado_envio, ubicacion, notas || null, foto_url || null];
-    } else {
-      queryInsert = `INSERT INTO historial_trazabilidad (numero_guia, estado_envio, ubicacion, notas, foto_url) VALUES ($1, $2, $3, $4, $5)`;
-      valores = [guiaLimpia, estado_envio, ubicacion, notas || null, foto_url || null];
-    }
-
-    await pool.query(queryInsert, valores);
 
     res.json({ success: true, message: 'Evento y cumplido registrados correctamente' });
   } catch (err) {
-    console.error('Error en POST /api/tracking:', err.message);
+    console.error('❌ Error en POST /api/tracking:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 app.listen(port, () => {
-  console.log(`Servidor activo en puerto ${port}`);
+  console.log(`Servidor activo en el puerto ${port}`);
 });
 
