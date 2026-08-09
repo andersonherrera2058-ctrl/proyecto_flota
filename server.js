@@ -16,16 +16,14 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// Inicialización de base de datos
+// Inicialización de la base de datos
 async function initDB() {
   try {
-    // 1. Eliminar la restricción Foreign Key si existía para permitir guías arbitrarias
     await pool.query(`
       ALTER TABLE historial_trazabilidad 
       DROP CONSTRAINT IF EXISTS historial_trazabilidad_guia_transporte_fkey;
     `);
 
-    // 2. Intentar cambiar o asegurar columnas como VARCHAR/TEXT
     await pool.query(`
       ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS guia_transporte VARCHAR(50);
       ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS numero_guia VARCHAR(50);
@@ -39,13 +37,12 @@ async function initDB() {
 }
 initDB();
 
-// GET: Consultar trazabilidad (Soporta números puros 16581 y alfanuméricos PDS-2026-001)
+// GET: Consultar trazabilidad de una guía
 app.get('/api/tracking/:guia', async (req, res) => {
   const { guia } = req.params;
   const guiaLimpia = guia.trim();
 
   try {
-    // Convertimos las columnas a TEXT explícitamente (::TEXT) para evitar errores de tipo si alguna es INTEGER
     const result = await pool.query(
       `SELECT * FROM historial_trazabilidad 
        WHERE UPPER(COALESCE(guia_transporte::TEXT, numero_guia::TEXT, '')) = UPPER($1)
@@ -60,16 +57,9 @@ app.get('/api/tracking/:guia', async (req, res) => {
   }
 });
 
-// POST: Registrar nuevo evento + foto (Compatible con cualquier tipo de guía)
+// POST: Registrar nuevo evento (Directo sin requerir clave API)
 app.post('/api/tracking', async (req, res) => {
-  const { numero_guia, estado_envio, ubicacion, notas, foto_url, api_key } = req.body;
-
-  const claveEsperada = (process.env.FREIGHT_API_KEY || 'aliado_carga_prodeseg_2026').trim();
-  const claveRecibida = (api_key || '').trim();
-
-  if (claveRecibida !== claveEsperada && claveRecibida !== 'aliado_carga_prodeseg_2026') {
-    return res.status(401).json({ error: 'No autorizado' });
-  }
+  const { numero_guia, estado_envio, ubicacion, notas, foto_url } = req.body;
 
   if (!numero_guia || !estado_envio || !ubicacion) {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
@@ -78,7 +68,6 @@ app.post('/api/tracking', async (req, res) => {
   try {
     const guiaLimpia = numero_guia.trim();
 
-    // Insertar intentando llenar ambas columnas para máxima compatibilidad
     await pool.query(
       `INSERT INTO historial_trazabilidad (guia_transporte, numero_guia, estado_envio, ubicacion, notas, foto_url) 
        VALUES ($1, $1, $2, $3, $4, $5)`,
