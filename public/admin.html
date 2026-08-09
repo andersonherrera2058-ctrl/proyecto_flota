@@ -1,86 +1,118 @@
-const express = require('express');
-const { Pool } = require('pg');
-const cors = require('cors');
-require('dotenv').config();
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Entrega y Estado - Conductores</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 15px; }
+    .card { max-width: 500px; margin: 10px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #0d6efd; margin-top: 0; margin-bottom: 20px; font-size: 1.4rem; }
+    .form-group { margin-bottom: 18px; }
+    label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.95rem; color: #333; }
+    input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+    button { width: 100%; padding: 14px; background-color: #198754; color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    button:hover { background-color: #146c43; }
+    .alert { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; }
+    .alert-success { background-color: #d1e7dd; color: #0f5132; }
+    .alert-danger { background-color: #f8d7da; color: #842029; }
+    #previewImg { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #ddd; }
+  </style>
+</head>
+<body>
 
-const app = express();
-const port = process.env.PORT || 3000;
+  <div class="card">
+    <h2>🚚 Registro de Estado / Cumplido</h2>
+    <form id="adminForm">
+      <div class="form-group">
+        <label>Número de Guía:</label>
+        <input type="text" id="guia" placeholder="Ingresa número de guía (ej. 16581)" required>
+      </div>
 
-app.use(cors());
-app.use(express.json({ limit: '15mb' }));
-app.use(express.urlencoded({ limit: '15mb', extended: true }));
-app.use(express.static('public'));
+      <div class="form-group">
+        <label>Estado del Envío:</label>
+        <select id="estado" required>
+          <option value="DESPACHADO">DESPACHADO</option>
+          <option value="EN_TRANSITO">EN TRÁNSITO</option>
+          <option value="EN_REPARTO">EN REPARTO</option>
+          <option value="ENTREGADO">ENTREGADO (CUMPLIDO)</option>
+          <option value="NOVEDAD">NOVEDAD / RETRASO</option>
+        </select>
+      </div>
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+      <div class="form-group">
+        <label>Ubicación Actual:</label>
+        <input type="text" id="ubicacion" placeholder="Ej. Municipio / Bodega / Punto de entrega" required>
+      </div>
 
-// Inicialización de base de datos
-async function initDB() {
-  try {
-    await pool.query(`
-      ALTER TABLE historial_trazabilidad 
-      DROP CONSTRAINT IF EXISTS historial_trazabilidad_guia_transporte_fkey;
-    `);
+      <div class="form-group">
+        <label>Notas u Observaciones:</label>
+        <textarea id="notas" rows="3" placeholder="Placa de vehículo, novedad o persona que recibe..."></textarea>
+      </div>
 
-    await pool.query(`
-      ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS guia_transporte VARCHAR(50);
-      ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS numero_guia VARCHAR(50);
-      ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS foto_url TEXT;
-    `);
+      <div class="form-group">
+        <label>📸 Foto del Cumplido / Remisión:</label>
+        <input type="file" id="fotoInput" accept="image/*" capture="environment" onchange="mostrarVistaPrevia()">
+        <img id="previewImg" alt="Vista previa de la foto">
+      </div>
 
-    console.log('✅ Base de datos reconfigurada correctamente.');
-  } catch (err) {
-    console.error('⚠️ Aviso en reconfiguración de BD:', err.message);
-  }
-}
-initDB();
+      <button type="submit">Registrar Evento</button>
+    </form>
 
-// GET: Consultar trazabilidad de una guía
-app.get('/api/tracking/:guia', async (req, res) => {
-  const { guia } = req.params;
-  const guiaLimpia = guia.trim();
+    <div id="mensaje"></div>
+  </div>
 
-  try {
-    const result = await pool.query(
-      `SELECT * FROM historial_trazabilidad 
-       WHERE UPPER(COALESCE(guia_transporte::TEXT, numero_guia::TEXT, '')) = UPPER($1)
-          OR UPPER(COALESCE(numero_guia::TEXT, guia_transporte::TEXT, '')) = UPPER($1)
-       ORDER BY fecha_reporte DESC`,
-      [guiaLimpia]
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error('❌ Error en GET /api/tracking:', err.message);
-    res.status(500).json({ error: `Error al consultar trazabilidad: ${err.message}` });
-  }
-});
+  <script>
+    let fotoBase64 = null;
 
-// POST: Registrar nuevo evento (Directo sin requerir clave API)
-app.post('/api/tracking', async (req, res) => {
-  const { numero_guia, estado_envio, ubicacion, notas, foto_url } = req.body;
+    function mostrarVistaPrevia() {
+      const file = document.getElementById('fotoInput').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          fotoBase64 = e.target.result;
+          const img = document.getElementById('previewImg');
+          img.src = fotoBase64;
+          img.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
 
-  if (!numero_guia || !estado_envio || !ubicacion) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios' });
-  }
+    document.getElementById('adminForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const mensajeDiv = document.getElementById('mensaje');
+      mensajeDiv.innerHTML = '<p style="text-align:center;">Enviando registro...</p>';
 
-  try {
-    const guiaLimpia = numero_guia.trim();
+      const payload = {
+        numero_guia: document.getElementById('guia').value,
+        estado_envio: document.getElementById('estado').value,
+        ubicacion: document.getElementById('ubicacion').value,
+        notas: document.getElementById('notas').value,
+        foto_url: fotoBase64
+      };
 
-    await pool.query(
-      `INSERT INTO historial_trazabilidad (guia_transporte, numero_guia, estado_envio, ubicacion, notas, foto_url) 
-       VALUES ($1, $1, $2, $3, $4, $5)`,
-      [guiaLimpia, estado_envio, ubicacion, notas || null, foto_url || null]
-    );
+      try {
+        const res = await fetch('/api/tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-    res.json({ success: true, message: 'Evento y cumplido registrados correctamente' });
-  } catch (err) {
-    console.error('❌ Error en POST /api/tracking:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
+        const data = await res.json();
 
-app.listen(port, () => {
-  console.log(`Servidor activo en el puerto ${port}`);
-});
+        if (res.ok && data.success) {
+          mensajeDiv.innerHTML = '<div class="alert alert-success">✅ Evento registrado exitosamente.</div>';
+          document.getElementById('adminForm').reset();
+          document.getElementById('previewImg').style.display = 'none';
+          fotoBase64 = null;
+        } else {
+          mensajeDiv.innerHTML = `<div class="alert alert-danger">❌ Error: ${data.error}</div>`;
+        }
+      } catch (err) {
+        mensajeDiv.innerHTML = `<div class="alert alert-danger">❌ Error de conexión: ${err.message}</div>`;
+      }
+    });
+  </script>
+</body>
+</html>
