@@ -3,152 +3,240 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trazabilidad de Envíos - Prodeseg</title>
+  <title>POLARIS INC - Logistics Ecosystem</title>
   <style>
     :root {
-      --primary: #0d6efd;
-      --bg: #f8f9fa;
-      --card-bg: #ffffff;
-      --text: #212529;
-      --border: #dee2e6;
+      --bg-space: #030712;
+      --card-bg: #0b1329;
+      --border-glow: #1e293b;
+      --accent-cyan: #38bdf8;
+      --accent-purple: #c084fc;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-space);
+      color: var(--text-main);
       margin: 0;
       padding: 20px;
+      min-height: 100vh;
+      background-image: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #030712 70%);
     }
 
     .container {
-      max-width: 650px;
+      max-width: 700px;
       margin: 30px auto;
       background: var(--card-bg);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 35px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--border-glow);
     }
 
-    h1 {
+    .brand-header {
       text-align: center;
-      color: #0b5ed7;
-      margin-bottom: 25px;
-      font-size: 1.8rem;
+      margin-bottom: 30px;
+    }
+
+    .brand-logo-icon {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 5px;
+    }
+
+    .brand-title {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+
+    .brand-title span {
+      font-size: 1.2rem;
+      font-weight: 300;
+      color: var(--accent-cyan);
+      letter-spacing: 3px;
+    }
+
+    .brand-tagline {
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-top: 10px;
+      font-weight: 600;
     }
 
     .search-box {
       display: flex;
       gap: 10px;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     input[type="text"] {
       flex: 1;
-      padding: 12px 15px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      padding: 14px 18px;
+      background-color: #030712;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
       font-size: 1rem;
+      color: white;
       outline: none;
+      transition: all 0.3s;
     }
 
-    button {
-      padding: 12px 20px;
-      background-color: var(--primary);
-      color: white;
+    input[type="text"]:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+    button.btn-search {
+      padding: 14px 24px;
+      background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
+      color: #030712;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       font-size: 1rem;
       cursor: pointer;
-      font-weight: bold;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      transition: transform 0.2s;
     }
+
+    button.btn-search:hover {
+      transform: translateY(-2px);
+    }
+
+    .export-actions {
+      display: none;
+      gap: 10px;
+      margin-bottom: 25px;
+      justify-content: flex-end;
+    }
+
+    .btn-export {
+      padding: 9px 16px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      border: none;
+    }
+
+    .btn-excel { background-color: #10b981; color: white; }
+    .btn-pdf { background-color: #ef4444; color: white; }
 
     .timeline {
       position: relative;
       padding-left: 25px;
-      border-left: 3px solid var(--border);
+      border-left: 2px solid var(--border-glow);
       margin-top: 20px;
     }
 
     .timeline-event {
       position: relative;
-      margin-bottom: 25px;
+      margin-bottom: 30px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
     }
 
     .timeline-event::before {
-      content: '';
+      content: '✦';
       position: absolute;
-      left: -32px;
-      top: 4px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background-color: var(--primary);
-      border: 3px solid white;
-      box-shadow: 0 0 0 2px var(--primary);
+      left: -33px;
+      top: 10px;
+      color: var(--accent-cyan);
+      font-size: 1rem;
     }
 
     .badge {
       display: inline-block;
-      padding: 5px 12px;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: bold;
-      margin-bottom: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
     }
 
-    .badge-success { background-color: #d1e7dd; color: #0f5132; }
-    .badge-info { background-color: #cff4fc; color: #055160; }
-    .badge-warning { background-color: #fff3cd; color: #664d03; }
-    .badge-danger { background-color: #f8d7da; color: #842029; }
-    .badge-default { background-color: #e2e3e5; color: #41464b; }
+    .badge-success { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+    .badge-info { background-color: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
+    .badge-warning { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+    .badge-danger { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+    .badge-default { background-color: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid #64748b; }
 
-    .location { font-weight: 600; font-size: 1.05rem; margin: 2px 0; }
-    .notes { color: #6c757d; font-size: 0.95rem; margin-top: 4px; }
-    .date { font-size: 0.8rem; color: #adb5bd; margin-top: 4px; }
+    .location { font-weight: 700; font-size: 1.05rem; color: #f8fafc; }
+    .notes { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
+    .date { font-size: 0.8rem; color: #64748b; margin-top: 6px; }
 
     .map-link {
       display: inline-block;
-      margin-top: 6px;
-      color: #0d6efd;
+      margin-top: 8px;
+      color: var(--accent-cyan);
       text-decoration: none;
-      font-weight: bold;
-      font-size: 0.9rem;
+      font-weight: 700;
+      font-size: 0.85rem;
     }
-    .map-link:hover { text-decoration: underline; }
 
     .foto-cumplido {
-      margin-top: 10px;
+      margin-top: 12px;
       max-width: 100%;
       max-height: 280px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      border: 1px solid var(--border-glow);
     }
 
     .alert {
       padding: 15px;
-      background-color: #f8d7da;
-      color: #842029;
-      border-radius: 8px;
+      background-color: rgba(239, 68, 68, 0.1);
+      border: 1px solid #ef4444;
+      color: #f87171;
+      border-radius: 10px;
       text-align: center;
+      font-weight: 600;
+    }
+
+    @media print {
+      body { background-color: white; color: black; padding: 0; }
+      .container { box-shadow: none; border: none; max-width: 100%; margin: 0; padding: 0; background: white; }
+      .search-box, .export-actions { display: none !important; }
+      .timeline-event { background: none; border: none; }
+      .location { color: black; }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>🚀 Consulta de Trazabilidad</h1>
+    <div class="brand-header">
+      <div class="brand-logo-icon">✦</div>
+      <h1 class="brand-title">POLARIS <span>INC</span></h1>
+      <div class="brand-tagline">SISTEMAS AUTOMATIZADOS PARA UN MUNDO GLOBALIZADO</div>
+    </div>
     
     <div class="search-box">
-      <input type="text" id="guiaInput" placeholder="Ingresa tu número de guía" value="16581">
-      <button onclick="buscarGuia()">Consultar</button>
+      <input type="text" id="guiaInput" placeholder="Número de guía o código de trazabilidad" value="16581">
+      <button class="btn-search" onclick="buscarGuia()">CONSULTAR</button>
+    </div>
+
+    <div id="exportBox" class="export-actions">
+      <button class="btn-export btn-excel" onclick="exportarExcel()">📊 Exportar Excel (.CSV)</button>
+      <button class="btn-export btn-pdf" onclick="window.print()">📄 Reporte PDF</button>
     </div>
 
     <div id="resultado"></div>
   </div>
 
   <script>
+    let datosTrazabilidadActuales = [];
+
     function obtenerClaseBadge(estado) {
       if (!estado) return 'badge-default';
       const est = estado.toUpperCase();
@@ -162,34 +250,42 @@
     async function buscarGuia() {
       const guia = document.getElementById('guiaInput').value.trim();
       const resultadoDiv = document.getElementById('resultado');
+      const exportBox = document.getElementById('exportBox');
 
       if (!guia) {
-        resultadoDiv.innerHTML = '<div class="alert">Por favor ingresa un número de guía.</div>';
+        resultadoDiv.innerHTML = '<div class="alert">Por favor ingrese un número de guía válido.</div>';
+        exportBox.style.display = 'none';
         return;
       }
 
-      resultadoDiv.innerHTML = '<p style="text-align:center;">Cargando trazabilidad...</p>';
+      resultadoDiv.innerHTML = '<p style="text-align:center; color:#94a3b8;">Conectando con Polaris Engine...</p>';
+      exportBox.style.display = 'none';
 
       try {
         const response = await fetch(`/api/tracking/${guia}`);
-        const data = await response.json();
+        const result = await response.json();
 
-        if (!response.ok || data.error) {
-          resultadoDiv.innerHTML = `<div class="alert">Error: ${data.error || 'No se pudo obtener la información.'}</div>`;
+        if (!response.ok || result.error) {
+          resultadoDiv.innerHTML = `<div class="alert">Error: ${result.error || 'No fue posible recuperar la información.'}</div>`;
           return;
         }
+
+        const data = result.data || [];
 
         if (data.length === 0) {
-          resultadoDiv.innerHTML = '<div class="alert">No se encontraron eventos registrados para esta guía.</div>';
+          resultadoDiv.innerHTML = '<div class="alert">No existen registros de trazabilidad asociados a esta guía.</div>';
           return;
         }
+
+        datosTrazabilidadActuales = data;
+        exportBox.style.display = 'flex';
 
         let html = '<div class="timeline">';
         data.forEach(evento => {
           const fecha = evento.fecha_reporte ? new Date(evento.fecha_reporte).toLocaleString('es-CO') : 'Sin fecha';
           const badgeClass = obtenerClaseBadge(evento.estado_envio);
           const fotoHtml = evento.foto_url ? `<br><img src="${evento.foto_url}" class="foto-cumplido" alt="Evidencia Fotográfica">` : '';
-          const mapHtml = evento.maps_url ? `<br><a href="${evento.maps_url}" target="_blank" class="map-link">🗺️ Ver ubicación exacta en Google Maps</a>` : '';
+          const mapHtml = evento.maps_url ? `<br><a href="${evento.maps_url}" target="_blank" class="map-link">🗺️ Coordenadas GPS en Google Maps</a>` : '';
 
           html += `
             <div class="timeline-event">
@@ -207,8 +303,34 @@
         resultadoDiv.innerHTML = html;
 
       } catch (err) {
-        resultadoDiv.innerHTML = `<div class="alert">Error de conexión: ${err.message}</div>`;
+        resultadoDiv.innerHTML = `<div class="alert">Error de comunicación: ${err.message}</div>`;
       }
+    }
+
+    function exportarExcel() {
+      if (datosTrazabilidadActuales.length === 0) return;
+
+      const guia = document.getElementById('guiaInput').value.trim();
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+      csvContent += "Polaris_INC_Guia;Estado;Ubicacion;Observaciones;Fecha_Hora;URL_GPS\n";
+
+      datosTrazabilidadActuales.forEach(e => {
+        const fecha = e.fecha_reporte ? new Date(e.fecha_reporte).toLocaleString('es-CO') : '';
+        const estado = (e.estado_envio || '').replace(/;/g, ',');
+        const ubica = (e.ubicacion || '').replace(/;/g, ',');
+        const notas = (e.notas || '').replace(/;/g, ',').replace(/\n/g, ' ');
+        const maps = e.maps_url || '';
+
+        csvContent += `"${guia}";"${estado}";"${ubica}";"${notas}";"${fecha}";"${maps}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Polaris_Trazabilidad_Guia_${guia}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     window.onload = buscarGuia;

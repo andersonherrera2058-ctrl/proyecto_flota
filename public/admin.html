@@ -3,39 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro de Entrega y Estado - Conductores</title>
+  <title>POLARIS INC - Campo & Operaciones</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 15px; }
-    .card { max-width: 500px; margin: 10px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    h2 { text-align: center; color: #0d6efd; margin-top: 0; margin-bottom: 20px; font-size: 1.4rem; }
-    .form-group { margin-bottom: 18px; }
-    label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.95rem; color: #333; }
-    input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-    
-    .input-gps-group { display: flex; gap: 8px; }
-    .btn-gps { width: auto; background-color: #0d6efd; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-    .btn-gps:hover { background-color: #0b5ed7; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: #030712;
+      color: #f8fafc;
+      margin: 0;
+      padding: 15px;
+      min-height: 100vh;
+      background-image: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #030712 70%);
+    }
 
-    button[type="submit"] { width: 100%; padding: 14px; background-color: #198754; color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
-    button[type="submit"]:hover { background-color: #146c43; }
-    .alert { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; }
-    .alert-success { background-color: #d1e7dd; color: #0f5132; }
-    .alert-danger { background-color: #f8d7da; color: #842029; }
-    #previewImg { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #ddd; }
+    .card {
+      max-width: 500px;
+      margin: 10px auto;
+      background: #0b1329;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.1);
+      border: 1px solid #1e293b;
+    }
+
+    .brand-title {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0;
+      letter-spacing: 2px;
+    }
+
+    .brand-title span { color: #38bdf8; font-size: 1rem; }
+
+    .brand-sub {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    .form-group { margin-bottom: 18px; }
+    label { font-weight: 700; display: block; margin-bottom: 6px; font-size: 0.85rem; color: #cbd5e1; }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      background-color: #030712;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      color: white;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #38bdf8;
+    }
+
+    .input-gps-group { display: flex; gap: 8px; }
+
+    .btn-gps {
+      width: auto;
+      background-color: #38bdf8;
+      color: #030712;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #030712;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-top: 10px;
+    }
+
+    .alert { margin-top: 15px; padding: 12px; border-radius: 10px; text-align: center; font-weight: 700; }
+    .alert-success { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+    .alert-danger { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+    #previewImg { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid #1e293b; }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h2>🚚 Registro de Estado / Cumplido</h2>
+    <div style="text-align:center; color:#38bdf8; font-size:1.8rem;">✦</div>
+    <h1 class="brand-title">POLARIS <span>INC</span></h1>
+    <div class="brand-sub">Sistemas Automatizados | Campo</div>
+
     <form id="adminForm">
       <div class="form-group">
-        <label>Número de Guía:</label>
-        <input type="text" id="guia" placeholder="Ingresa número de guía (ej. 16581)" required>
+        <label>NÚMERO DE GUÍA / CÓDIGO:</label>
+        <input type="text" id="guia" placeholder="Ej. 16581 o PDS-2026-001" required>
       </div>
 
       <div class="form-group">
-        <label>Estado del Envío:</label>
+        <label>ESTADO OPERATIVO:</label>
         <select id="estado" required>
           <option value="DESPACHADO">DESPACHADO</option>
           <option value="EN_TRANSITO">EN TRÁNSITO</option>
@@ -46,25 +124,25 @@
       </div>
 
       <div class="form-group">
-        <label>Ubicación Actual:</label>
+        <label>UBICACIÓN ACTUAL:</label>
         <div class="input-gps-group">
-          <input type="text" id="ubicacion" placeholder="Ej. Medellín, Antioquia" required>
-          <button type="button" class="btn-gps" onclick="capturarGPS()">📍 Usar GPS</button>
+          <input type="text" id="ubicacion" placeholder="Ej. Municipio / Bodega / Punto de control" required>
+          <button type="button" class="btn-gps" onclick="capturarGPS()">📍 GPS</button>
         </div>
       </div>
 
       <div class="form-group">
-        <label>Notas u Observaciones:</label>
-        <textarea id="notas" rows="3" placeholder="Placa de vehículo, novedad o persona que recibe..."></textarea>
+        <label>NOTAS / NOVEDADES:</label>
+        <textarea id="notas" rows="3" placeholder="Detalles de la entrega o novedad..."></textarea>
       </div>
 
       <div class="form-group">
-        <label>📸 Foto del Cumplido / Remisión:</label>
+        <label>📸 EVIDENCIA / CUMPLIDO:</label>
         <input type="file" id="fotoInput" accept="image/*" capture="environment" onchange="mostrarVistaPrevia()">
-        <img id="previewImg" alt="Vista previa de la foto">
+        <img id="previewImg" alt="Vista previa de la evidencia">
       </div>
 
-      <button type="submit">Registrar Evento</button>
+      <button type="submit">REGISTRAR EVENTO</button>
     </form>
 
     <div id="mensaje"></div>
@@ -77,22 +155,22 @@
     function capturarGPS() {
       const ubicacionInput = document.getElementById('ubicacion');
       if (navigator.geolocation) {
-        ubicacionInput.value = "Obteniendo ubicación GPS...";
+        ubicacionInput.value = "Obteniendo coordenadas...";
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            ubicacionInput.value = `Ubicación GPS (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+            ubicacionInput.value = `GPS (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
             enlaceGoogleMaps = `https://www.google.com/maps?q=${lat},${lng}`;
           },
           (error) => {
-            alert("No se pudo obtener el GPS. Revisa los permisos de ubicación en tu teléfono.");
+            alert("Acceso GPS denegado o no disponible.");
             ubicacionInput.value = "";
           },
           { enableHighAccuracy: true }
         );
       } else {
-        alert("Tu dispositivo o navegador no soporta geolocalización GPS.");
+        alert("Navegador no compatible con geolocalización.");
       }
     }
 
@@ -113,7 +191,7 @@
     document.getElementById('adminForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const mensajeDiv = document.getElementById('mensaje');
-      mensajeDiv.innerHTML = '<p style="text-align:center;">Enviando registro...</p>';
+      mensajeDiv.innerHTML = '<p style="text-align:center; color:#94a3b8;">Sincronizando evento...</p>';
 
       const payload = {
         numero_guia: document.getElementById('guia').value,
@@ -131,16 +209,16 @@
           body: JSON.stringify(payload)
         });
 
-        const data = await res.json();
+        const result = await res.json();
 
-        if (res.ok && data.success) {
-          mensajeDiv.innerHTML = '<div class="alert alert-success">✅ Evento registrado exitosamente.</div>';
+        if (res.ok && result.success) {
+          mensajeDiv.innerHTML = '<div class="alert alert-success">✅ Registro procesado con éxito.</div>';
           document.getElementById('adminForm').reset();
           document.getElementById('previewImg').style.display = 'none';
           fotoBase64 = null;
           enlaceGoogleMaps = null;
         } else {
-          mensajeDiv.innerHTML = `<div class="alert alert-danger">❌ Error: ${data.error}</div>`;
+          mensajeDiv.innerHTML = `<div class="alert alert-danger">❌ Error: ${result.error}</div>`;
         }
       } catch (err) {
         mensajeDiv.innerHTML = `<div class="alert alert-danger">❌ Error de conexión: ${err.message}</div>`;
