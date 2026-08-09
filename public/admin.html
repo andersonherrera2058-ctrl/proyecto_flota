@@ -11,8 +11,13 @@
     .form-group { margin-bottom: 18px; }
     label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 0.95rem; color: #333; }
     input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-    button { width: 100%; padding: 14px; background-color: #198754; color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
-    button:hover { background-color: #146c43; }
+    
+    .input-gps-group { display: flex; gap: 8px; }
+    .btn-gps { width: auto; background-color: #0d6efd; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    .btn-gps:hover { background-color: #0b5ed7; }
+
+    button[type="submit"] { width: 100%; padding: 14px; background-color: #198754; color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    button[type="submit"]:hover { background-color: #146c43; }
     .alert { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; }
     .alert-success { background-color: #d1e7dd; color: #0f5132; }
     .alert-danger { background-color: #f8d7da; color: #842029; }
@@ -42,7 +47,10 @@
 
       <div class="form-group">
         <label>Ubicación Actual:</label>
-        <input type="text" id="ubicacion" placeholder="Ej. Municipio / Bodega / Punto de entrega" required>
+        <div class="input-gps-group">
+          <input type="text" id="ubicacion" placeholder="Ej. Medellín, Antioquia" required>
+          <button type="button" class="btn-gps" onclick="capturarGPS()">📍 Usar GPS</button>
+        </div>
       </div>
 
       <div class="form-group">
@@ -64,6 +72,29 @@
 
   <script>
     let fotoBase64 = null;
+    let enlaceGoogleMaps = null;
+
+    function capturarGPS() {
+      const ubicacionInput = document.getElementById('ubicacion');
+      if (navigator.geolocation) {
+        ubicacionInput.value = "Obteniendo ubicación GPS...";
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            ubicacionInput.value = `Ubicación GPS (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+            enlaceGoogleMaps = `https://www.google.com/maps?q=${lat},${lng}`;
+          },
+          (error) => {
+            alert("No se pudo obtener el GPS. Revisa los permisos de ubicación en tu teléfono.");
+            ubicacionInput.value = "";
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        alert("Tu dispositivo o navegador no soporta geolocalización GPS.");
+      }
+    }
 
     function mostrarVistaPrevia() {
       const file = document.getElementById('fotoInput').files[0];
@@ -89,7 +120,8 @@
         estado_envio: document.getElementById('estado').value,
         ubicacion: document.getElementById('ubicacion').value,
         notas: document.getElementById('notas').value,
-        foto_url: fotoBase64
+        foto_url: fotoBase64,
+        maps_url: enlaceGoogleMaps
       };
 
       try {
@@ -106,6 +138,7 @@
           document.getElementById('adminForm').reset();
           document.getElementById('previewImg').style.display = 'none';
           fotoBase64 = null;
+          enlaceGoogleMaps = null;
         } else {
           mensajeDiv.innerHTML = `<div class="alert alert-danger">❌ Error: ${data.error}</div>`;
         }

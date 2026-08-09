@@ -16,7 +16,6 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// Inicialización de la base de datos
 async function initDB() {
   try {
     await pool.query(`
@@ -28,16 +27,16 @@ async function initDB() {
       ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS guia_transporte VARCHAR(50);
       ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS numero_guia VARCHAR(50);
       ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS foto_url TEXT;
+      ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS maps_url TEXT;
     `);
 
-    console.log('✅ Base de datos reconfigurada correctamente.');
+    console.log('✅ Base de datos verificada y lista con columna GPS.');
   } catch (err) {
     console.error('⚠️ Aviso en reconfiguración de BD:', err.message);
   }
 }
 initDB();
 
-// GET: Consultar trazabilidad de una guía
 app.get('/api/tracking/:guia', async (req, res) => {
   const { guia } = req.params;
   const guiaLimpia = guia.trim();
@@ -57,9 +56,8 @@ app.get('/api/tracking/:guia', async (req, res) => {
   }
 });
 
-// POST: Registrar nuevo evento (Directo sin requerir clave API)
 app.post('/api/tracking', async (req, res) => {
-  const { numero_guia, estado_envio, ubicacion, notas, foto_url } = req.body;
+  const { numero_guia, estado_envio, ubicacion, notas, foto_url, maps_url } = req.body;
 
   if (!numero_guia || !estado_envio || !ubicacion) {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
@@ -69,12 +67,12 @@ app.post('/api/tracking', async (req, res) => {
     const guiaLimpia = numero_guia.trim();
 
     await pool.query(
-      `INSERT INTO historial_trazabilidad (guia_transporte, numero_guia, estado_envio, ubicacion, notas, foto_url) 
-       VALUES ($1, $1, $2, $3, $4, $5)`,
-      [guiaLimpia, estado_envio, ubicacion, notas || null, foto_url || null]
+      `INSERT INTO historial_trazabilidad (guia_transporte, numero_guia, estado_envio, ubicacion, notas, foto_url, maps_url) 
+       VALUES ($1, $1, $2, $3, $4, $5, $6)`,
+      [guiaLimpia, estado_envio, ubicacion, notas || null, foto_url || null, maps_url || null]
     );
 
-    res.json({ success: true, message: 'Evento y cumplido registrados correctamente' });
+    res.json({ success: true, message: 'Evento y GPS registrados correctamente' });
   } catch (err) {
     console.error('❌ Error en POST /api/tracking:', err.message);
     res.status(500).json({ error: err.message });

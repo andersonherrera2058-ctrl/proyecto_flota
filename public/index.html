@@ -107,6 +107,16 @@
     .notes { color: #6c757d; font-size: 0.95rem; margin-top: 4px; }
     .date { font-size: 0.8rem; color: #adb5bd; margin-top: 4px; }
 
+    .map-link {
+      display: inline-block;
+      margin-top: 6px;
+      color: #0d6efd;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .map-link:hover { text-decoration: underline; }
+
     .foto-cumplido {
       margin-top: 10px;
       max-width: 100%;
@@ -179,11 +189,13 @@
           const fecha = evento.fecha_reporte ? new Date(evento.fecha_reporte).toLocaleString('es-CO') : 'Sin fecha';
           const badgeClass = obtenerClaseBadge(evento.estado_envio);
           const fotoHtml = evento.foto_url ? `<br><img src="${evento.foto_url}" class="foto-cumplido" alt="Evidencia Fotográfica">` : '';
+          const mapHtml = evento.maps_url ? `<br><a href="${evento.maps_url}" target="_blank" class="map-link">🗺️ Ver ubicación exacta en Google Maps</a>` : '';
 
           html += `
             <div class="timeline-event">
               <span class="badge ${badgeClass}">${evento.estado_envio}</span>
               <div class="location">📍 ${evento.ubicacion}</div>
+              ${mapHtml}
               <div class="notes">${evento.notas || ''}</div>
               ${fotoHtml}
               <div class="date">🕒 ${fecha}</div>
