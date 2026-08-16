@@ -20,10 +20,10 @@ const SYSTEM_META = {
   organization: "PRODESEG S.A.",
   tagline: "Protección Contra Incendios y Seguridad Industrial",
   website: "www.prodeseg.com.co",
-  engine: "Prodeseg Logistics & Tracking API v2.0"
+  engine: "Prodeseg Logistics & Tracking API v2.5"
 };
 
-// Inicialización de base de datos
+// Inicialización de la base de datos
 async function initDB() {
   try {
     await pool.query(`
@@ -45,7 +45,7 @@ async function initDB() {
 }
 initDB();
 
-// GET: Consultar trazabilidad de una guía (Soporta múltiples columnas y formatos)
+// GET: Consultar trazabilidad de una guía específica
 app.get('/api/tracking/:guia', async (req, res) => {
   const { guia } = req.params;
   const guiaLimpia = guia.trim();
@@ -73,7 +73,34 @@ app.get('/api/tracking/:guia', async (req, res) => {
   }
 });
 
-// POST: Registrar nuevo evento + Foto + GPS
+// GET: Generar Reporte Consolidado General (Todas las guías para Excel)
+app.get('/api/reports/general', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT 
+         COALESCE(guia_transporte, numero_guia) AS guia,
+         estado_envio,
+         ubicacion,
+         notas,
+         maps_url,
+         fecha_reporte,
+         CASE WHEN foto_url IS NOT NULL THEN 'SI' ELSE 'NO' END AS tiene_evidencia
+       FROM historial_trazabilidad 
+       ORDER BY fecha_reporte DESC`
+    );
+
+    res.json({
+      meta: SYSTEM_META,
+      total_records: result.rows.length,
+      data: result.rows
+    });
+  } catch (err) {
+    console.error('❌ Error en GET /api/reports/general:', err.message);
+    res.status(500).json({ meta: SYSTEM_META, error: 'Error al obtener reporte general de despachos.' });
+  }
+});
+
+// POST: Registrar evento de campo + Foto HD comprimida + GPS
 app.post('/api/tracking', async (req, res) => {
   const { numero_guia, estado_envio, ubicacion, notas, foto_url, maps_url } = req.body;
 
@@ -101,7 +128,7 @@ app.post('/api/tracking', async (req, res) => {
   }
 });
 
-// GET: Métricas e Indicadores de Efectividad para Dashboard
+// GET: Indicadores de gestión y efectividad para Dashboard
 app.get('/api/dashboard', async (req, res) => {
   const { fecha_inicio, fecha_fin } = req.query;
 
