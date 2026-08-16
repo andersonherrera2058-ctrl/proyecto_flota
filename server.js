@@ -17,9 +17,10 @@ const pool = new Pool({
 });
 
 const SYSTEM_META = {
-  organization: "Polaris I.N.C",
-  tagline: "Sistemas automatizados para un mundo globalizado",
-  engine: "Polaris Logistics Ecosystem v2.0"
+  organization: "PRODESEG S.A.",
+  tagline: "Protección Contra Incendios y Seguridad Industrial",
+  website: "www.prodeseg.com.co",
+  engine: "Prodeseg Logistics & Tracking API v2.0"
 };
 
 // Inicialización de base de datos
@@ -37,9 +38,9 @@ async function initDB() {
       ALTER TABLE historial_trazabilidad ADD COLUMN IF NOT EXISTS maps_url TEXT;
     `);
 
-    console.log('⚡ [POLARIS I.N.C] Base de datos sincronizada y lista.');
+    console.log('🔥 [PRODESEG S.A.] Base de datos sincronizada y lista.');
   } catch (err) {
-    console.error('⚠️ [POLARIS I.N.C] Aviso en BD:', err.message);
+    console.error('⚠️ [PRODESEG S.A.] Aviso en BD:', err.message);
   }
 }
 initDB();
@@ -92,7 +93,7 @@ app.post('/api/tracking', async (req, res) => {
     res.json({ 
       meta: SYSTEM_META, 
       success: true, 
-      message: 'Evento guardado exitosamente en Polaris I.N.C' 
+      message: 'Evento guardado exitosamente en PRODESEG S.A.' 
     });
   } catch (err) {
     console.error('❌ Error en POST /api/tracking:', err.message);
@@ -160,6 +161,6 @@ app.get('/api/dashboard', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`🚀 [POLARIS I.N.C] Servidor ejecutándose en el puerto ${port}`);
+  console.log(`🔥 [PRODESEG S.A.] Servidor ejecutándose en el puerto ${port}`);
 });
 

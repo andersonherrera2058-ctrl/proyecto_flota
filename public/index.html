@@ -3,36 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>POLARIS INC - Logistics Ecosystem</title>
+  <title>PRODESEG S.A. - Trazabilidad de Envíos</title>
   <style>
     :root {
-      --bg-space: #030712;
-      --card-bg: #0b1329;
-      --border-glow: #1e293b;
-      --accent-cyan: #38bdf8;
-      --accent-purple: #c084fc;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --brand-gold: #a87b32;
+      --brand-dark: #2a2015;
+      --bg-body: #fbf9f5;
+      --card-bg: #ffffff;
+      --border-color: #e6dfd5;
+      --text-main: #2b2520;
+      --text-muted: #73695f;
     }
 
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background-color: var(--bg-space);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-body);
       color: var(--text-main);
       margin: 0;
       padding: 20px;
-      min-height: 100vh;
-      background-image: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #030712 70%);
     }
 
     .container {
-      max-width: 700px;
-      margin: 30px auto;
+      max-width: 720px;
+      margin: 20px auto;
       background: var(--card-bg);
       padding: 35px;
-      border-radius: 20px;
-      box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
-      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(42, 32, 21, 0.08);
+      border: 1px solid var(--border-color);
     }
 
     .brand-header {
@@ -40,76 +38,63 @@
       margin-bottom: 30px;
     }
 
-    .brand-logo-icon {
-      font-size: 2.5rem;
-      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 5px;
+    .brand-logo {
+      max-width: 260px;
+      height: auto;
+      margin-bottom: 12px;
     }
 
     .brand-title {
-      font-size: 2.4rem;
-      font-weight: 900;
-      color: #ffffff;
-      letter-spacing: 2px;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--brand-dark);
       margin: 0;
-    }
-
-    .brand-title span {
-      font-size: 1.2rem;
-      font-weight: 300;
-      color: var(--accent-cyan);
-      letter-spacing: 3px;
+      letter-spacing: 1px;
     }
 
     .brand-tagline {
-      font-size: 0.75rem;
-      color: var(--accent-cyan);
+      font-size: 0.8rem;
+      color: var(--brand-gold);
       text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-top: 10px;
-      font-weight: 600;
+      letter-spacing: 1.5px;
+      margin-top: 6px;
+      font-weight: 700;
     }
 
     .search-box {
       display: flex;
       gap: 10px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     input[type="text"] {
       flex: 1;
       padding: 14px 18px;
-      background-color: #030712;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
       font-size: 1rem;
-      color: white;
       outline: none;
-      transition: all 0.3s;
+      transition: border 0.2s;
     }
 
     input[type="text"]:focus {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+      border-color: var(--brand-gold);
     }
 
     button.btn-search {
       padding: 14px 24px;
-      background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
-      color: #030712;
+      background-color: var(--brand-gold);
+      color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       font-size: 1rem;
       cursor: pointer;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      transition: transform 0.2s;
+      font-weight: 700;
+      transition: background 0.2s;
     }
 
     button.btn-search:hover {
-      transform: translateY(-2px);
+      background-color: #8a6125;
     }
 
     .export-actions {
@@ -128,61 +113,60 @@
       border: none;
     }
 
-    .btn-excel { background-color: #10b981; color: white; }
-    .btn-pdf { background-color: #ef4444; color: white; }
+    .btn-excel { background-color: #198754; color: white; }
+    .btn-pdf { background-color: #dc3545; color: white; }
 
     .timeline {
       position: relative;
       padding-left: 25px;
-      border-left: 2px solid var(--border-glow);
+      border-left: 3px solid var(--border-color);
       margin-top: 20px;
     }
 
     .timeline-event {
       position: relative;
       margin-bottom: 30px;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 15px;
-      border-radius: 12px;
-      border: 1px solid #1e293b;
     }
 
     .timeline-event::before {
-      content: '✦';
+      content: '';
       position: absolute;
-      left: -33px;
-      top: 10px;
-      color: var(--accent-cyan);
-      font-size: 1rem;
+      left: -32px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: var(--brand-gold);
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px var(--brand-gold);
     }
 
     .badge {
       display: inline-block;
-      padding: 4px 12px;
+      padding: 5px 12px;
       border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 800;
-      letter-spacing: 1px;
+      font-size: 0.8rem;
+      font-weight: 700;
       margin-bottom: 8px;
     }
 
-    .badge-success { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
-    .badge-info { background-color: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
-    .badge-warning { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
-    .badge-danger { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-    .badge-default { background-color: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid #64748b; }
+    .badge-success { background-color: #d1e7dd; color: #0f5132; }
+    .badge-info { background-color: #f0e6d2; color: #6e501d; }
+    .badge-warning { background-color: #fff3cd; color: #664d03; }
+    .badge-danger { background-color: #f8d7da; color: #842029; }
+    .badge-default { background-color: #e2e3e5; color: #41464b; }
 
-    .location { font-weight: 700; font-size: 1.05rem; color: #f8fafc; }
+    .location { font-weight: 700; font-size: 1.05rem; color: var(--brand-dark); }
     .notes { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
-    .date { font-size: 0.8rem; color: #64748b; margin-top: 6px; }
+    .date { font-size: 0.8rem; color: #9c9287; margin-top: 6px; }
 
     .map-link {
       display: inline-block;
-      margin-top: 8px;
-      color: var(--accent-cyan);
+      margin-top: 6px;
+      color: var(--brand-gold);
       text-decoration: none;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
 
     .foto-cumplido {
@@ -190,25 +174,31 @@
       max-width: 100%;
       max-height: 280px;
       border-radius: 10px;
-      border: 1px solid var(--border-glow);
+      border: 1px solid var(--border-color);
     }
 
     .alert {
       padding: 15px;
-      background-color: rgba(239, 68, 68, 0.1);
-      border: 1px solid #ef4444;
-      color: #f87171;
+      background-color: #f8d7da;
+      color: #842029;
       border-radius: 10px;
       text-align: center;
       font-weight: 600;
     }
 
+    .footer-brand {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      padding-top: 15px;
+    }
+
     @media print {
-      body { background-color: white; color: black; padding: 0; }
-      .container { box-shadow: none; border: none; max-width: 100%; margin: 0; padding: 0; background: white; }
+      body { background-color: white; padding: 0; }
+      .container { box-shadow: none; border: none; max-width: 100%; margin: 0; padding: 0; }
       .search-box, .export-actions { display: none !important; }
-      .timeline-event { background: none; border: none; }
-      .location { color: black; }
     }
   </style>
 </head>
@@ -216,22 +206,26 @@
 
   <div class="container">
     <div class="brand-header">
-      <div class="brand-logo-icon">✦</div>
-      <h1 class="brand-title">POLARIS <span>INC</span></h1>
-      <div class="brand-tagline">SISTEMAS AUTOMATIZADOS PARA UN MUNDO GLOBALIZADO</div>
+      <img src="/logo-prodeseg.png" alt="PRODESEG S.A." class="brand-logo" onerror="this.style.display='none'">
+      <h1 class="brand-title">PRODESEG S.A.</h1>
+      <div class="brand-tagline">PROTECCIÓN CONTRA INCENDIOS Y SEGURIDAD INDUSTRIAL</div>
     </div>
     
     <div class="search-box">
-      <input type="text" id="guiaInput" placeholder="Número de guía o código de trazabilidad" value="16581">
-      <button class="btn-search" onclick="buscarGuia()">CONSULTAR</button>
+      <input type="text" id="guiaInput" placeholder="Ingrese número de guía o despacho" value="16581">
+      <button class="btn-search" onclick="buscarGuia()">Consultar</button>
     </div>
 
     <div id="exportBox" class="export-actions">
-      <button class="btn-export btn-excel" onclick="exportarExcel()">📊 Exportar Excel (.CSV)</button>
-      <button class="btn-export btn-pdf" onclick="window.print()">📄 Reporte PDF</button>
+      <button class="btn-export btn-excel" onclick="exportarExcel()">📊 Descargar Excel (.CSV)</button>
+      <button class="btn-export btn-pdf" onclick="window.print()">📄 Guardar Reporte PDF</button>
     </div>
 
     <div id="resultado"></div>
+
+    <div class="footer-brand">
+      🌐 <strong>www.prodeseg.com.co</strong>
+    </div>
   </div>
 
   <script>
@@ -258,7 +252,7 @@
         return;
       }
 
-      resultadoDiv.innerHTML = '<p style="text-align:center; color:#94a3b8;">Conectando con Polaris Engine...</p>';
+      resultadoDiv.innerHTML = '<p style="text-align:center; color:#73695f;">Consultando trazabilidad PRODESEG S.A...</p>';
       exportBox.style.display = 'none';
 
       try {
@@ -266,26 +260,26 @@
         const result = await response.json();
 
         if (!response.ok || result.error) {
-          resultadoDiv.innerHTML = `<div class="alert">Error: ${result.error || 'No fue posible recuperar la información.'}</div>`;
+          resultadoDiv.innerHTML = `<div class="alert">Error: ${result.error || 'No se pudo obtener la información.'}</div>`;
           return;
         }
 
-        const data = result.data || [];
+        const eventos = result.data || [];
 
-        if (data.length === 0) {
-          resultadoDiv.innerHTML = '<div class="alert">No existen registros de trazabilidad asociados a esta guía.</div>';
+        if (eventos.length === 0) {
+          resultadoDiv.innerHTML = '<div class="alert">No se encontraron eventos registrados para esta guía.</div>';
           return;
         }
 
-        datosTrazabilidadActuales = data;
+        datosTrazabilidadActuales = eventos;
         exportBox.style.display = 'flex';
 
         let html = '<div class="timeline">';
-        data.forEach(evento => {
+        eventos.forEach(evento => {
           const fecha = evento.fecha_reporte ? new Date(evento.fecha_reporte).toLocaleString('es-CO') : 'Sin fecha';
           const badgeClass = obtenerClaseBadge(evento.estado_envio);
           const fotoHtml = evento.foto_url ? `<br><img src="${evento.foto_url}" class="foto-cumplido" alt="Evidencia Fotográfica">` : '';
-          const mapHtml = evento.maps_url ? `<br><a href="${evento.maps_url}" target="_blank" class="map-link">🗺️ Coordenadas GPS en Google Maps</a>` : '';
+          const mapHtml = evento.maps_url ? `<br><a href="${evento.maps_url}" target="_blank" class="map-link">🗺️ Ver ubicación en Google Maps</a>` : '';
 
           html += `
             <div class="timeline-event">
@@ -303,7 +297,7 @@
         resultadoDiv.innerHTML = html;
 
       } catch (err) {
-        resultadoDiv.innerHTML = `<div class="alert">Error de comunicación: ${err.message}</div>`;
+        resultadoDiv.innerHTML = `<div class="alert">Error de conexión: ${err.message}</div>`;
       }
     }
 
@@ -312,7 +306,7 @@
 
       const guia = document.getElementById('guiaInput').value.trim();
       let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-      csvContent += "Polaris_INC_Guia;Estado;Ubicacion;Observaciones;Fecha_Hora;URL_GPS\n";
+      csvContent += "PRODESEG_Guia;Estado;Ubicacion;Notas;Fecha;Google_Maps\n";
 
       datosTrazabilidadActuales.forEach(e => {
         const fecha = e.fecha_reporte ? new Date(e.fecha_reporte).toLocaleString('es-CO') : '';
@@ -327,7 +321,7 @@
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Polaris_Trazabilidad_Guia_${guia}.csv`);
+      link.setAttribute("download", `PRODESEG_Trazabilidad_Guia_${guia}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
