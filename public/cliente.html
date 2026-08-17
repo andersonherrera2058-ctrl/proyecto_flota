@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PRODESEG S.A. - Trazabilidad de Envíos</title>
+  
+  <!-- Configuración App Móvil PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#a87b32">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PRODESEG Envíos">
+
   <style>
     :root {
       --brand-gold: #a87b32;
@@ -36,6 +44,10 @@
     .brand-header {
       text-align: center;
       margin-bottom: 25px;
+    }
+
+    .brand-title-link {
+      text-decoration: none;
     }
 
     .brand-title {
@@ -158,7 +170,9 @@
 
   <div class="container">
     <div class="brand-header">
-      <h1 class="brand-title">PRODESEG S.A.</h1>
+      <a href="/admin.html" class="brand-title-link" title="Acceso Interno">
+        <h1 class="brand-title">🔥 PRODESEG S.A.</h1>
+      </a>
       <div class="brand-tagline">PROTECCIÓN CONTRA INCENDIOS Y SEGURIDAD INDUSTRIAL</div>
     </div>
     

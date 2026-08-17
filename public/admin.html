@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PRODESEG S.A. - Gestión y Registro Operativo</title>
+
+  <!-- Configuración App Móvil PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#a87b32">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PRODESEG Ops">
+
   <style>
     :root {
       --brand-gold: #a87b32;
@@ -66,7 +74,6 @@
     <h2 class="brand-title">🔥 PRODESEG S.A.</h2>
     <div class="brand-sub">Panel de Control & Registro Operativo</div>
 
-    <!-- Módulo de Exportación General Interna -->
     <div class="toolbar-admin">
       <button class="btn-excel-global" onclick="exportarConsolidadoGeneral()">📊 Descargar Reporte General Excel (.CSV)</button>
     </div>
