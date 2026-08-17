@@ -3,19 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PRODESEG S.A. - Registro de Campo</title>
+  <title>PRODESEG S.A. - Gestión y Registro Operativo</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fbf9f5; margin: 0; padding: 15px; }
-    .card { max-width: 520px; margin: 10px auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); border: 1px solid #e6dfd5; }
-    .brand-title { text-align: center; color: #a87b32; margin-top: 0; margin-bottom: 4px; font-size: 1.6rem; font-weight: 800; }
-    .brand-sub { text-align: center; font-size: 0.8rem; color: #73695f; text-transform: uppercase; margin-bottom: 22px; font-weight: 700; letter-spacing: 1px; }
+    :root {
+      --brand-gold: #a87b32;
+      --brand-dark: #2a2015;
+      --bg-body: #fbf9f5;
+      --card-bg: #ffffff;
+      --border-color: #e6dfd5;
+      --text-main: #2b2520;
+      --text-muted: #73695f;
+    }
+
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-body); margin: 0; padding: 15px; }
+    .card { max-width: 520px; margin: 10px auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); border: 1px solid var(--border-color); }
+    .brand-title { text-align: center; color: var(--brand-gold); margin-top: 0; margin-bottom: 4px; font-size: 1.6rem; font-weight: 800; }
+    .brand-sub { text-align: center; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 20px; font-weight: 700; letter-spacing: 1px; }
+    
+    .toolbar-admin {
+      background-color: #f1ece4;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-excel-global {
+      background-color: #198754;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn-excel-global:hover { background-color: #146c43; }
+
     .form-group { margin-bottom: 18px; }
-    label { font-weight: 700; display: block; margin-bottom: 6px; font-size: 0.95rem; color: #2b2520; }
+    label { font-weight: 700; display: block; margin-bottom: 6px; font-size: 0.95rem; color: var(--text-main); }
     input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; outline: none; }
-    input:focus, select:focus, textarea:focus { border-color: #a87b32; }
+    input:focus, select:focus, textarea:focus { border-color: var(--brand-gold); }
     
     .input-gps-group { display: flex; gap: 8px; }
-    .btn-gps { width: auto; background-color: #a87b32; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    .btn-gps { width: auto; background-color: var(--brand-gold); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
     .btn-gps:hover { background-color: #8a6125; }
 
     button[type="submit"] { width: 100%; padding: 14px; background-color: #198754; color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold; margin-top: 10px; }
@@ -31,12 +64,17 @@
 
   <div class="card">
     <h2 class="brand-title">🔥 PRODESEG S.A.</h2>
-    <div class="brand-sub">Registro de Estado y Cumplido</div>
+    <div class="brand-sub">Panel de Control & Registro Operativo</div>
+
+    <!-- Módulo de Exportación General Interna -->
+    <div class="toolbar-admin">
+      <button class="btn-excel-global" onclick="exportarConsolidadoGeneral()">📊 Descargar Reporte General Excel (.CSV)</button>
+    </div>
 
     <form id="adminForm">
       <div class="form-group">
         <label>Número de Guía / Despacho:</label>
-        <input type="text" id="guia" placeholder="Ingresa número de guía (ej. 16581)" required>
+        <input type="text" id="guia" placeholder="Ingresa número de guía (ej. PRO-001)" required>
       </div>
 
       <div class="form-group">
@@ -61,23 +99,24 @@
 
       <div class="form-group">
         <label>Notas u Observaciones:</label>
-        <textarea id="notas" rows="3" placeholder="Detalles de entrega, razón de espera en CEDI, cita programada o novedades..."></textarea>
+        <textarea id="notas" rows="3" placeholder="Detalles de entrega, nombre de quien recibe o novedades..."></textarea>
       </div>
 
       <div class="form-group">
         <label>📸 Foto HD del Cumplido / Remisión:</label>
         <input type="file" id="fotoInput" accept="image/*" capture="environment" onchange="procesarFotoOptimizada()">
-        <span id="fotoEstado" class="status-text">Captura directa desde la cámara del celular.</span>
-        <img id="previewImg" alt="Vista previa optimizada de la foto">
+        <span id="fotoEstado" class="status-text">Captura directa desde la cámara.</span>
+        <img id="previewImg" alt="Vista previa optimizada">
       </div>
 
-      <button type="submit">Registrar Evento</button>
+      <button type="submit">Guardar Registro Protegido</button>
     </form>
 
     <div id="mensaje"></div>
   </div>
 
   <script>
+    const API_KEY = "PRODESEG_LIVE_2026";
     let fotoBase64 = null;
     let enlaceGoogleMaps = null;
 
@@ -103,13 +142,12 @@
       }
     }
 
-    // Compresión Inteligente con Canvas HD
     function procesarFotoOptimizada() {
       const file = document.getElementById('fotoInput').files[0];
       const estadoSpan = document.getElementById('fotoEstado');
       if (!file) return;
 
-      estadoSpan.innerText = "Optimizando resolución HD para envío rápido...";
+      estadoSpan.innerText = "Optimizando resolución HD...";
 
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -124,15 +162,9 @@
           let height = img.height;
 
           if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
+            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
           } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
+            if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
           }
 
           canvas.width = width;
@@ -147,7 +179,7 @@
           preview.src = fotoBase64;
           preview.style.display = 'block';
 
-          estadoSpan.innerText = "✅ Imagen HD lista y optimizada.";
+          estadoSpan.innerText = "✅ Imagen HD optimizada.";
         };
       };
       reader.readAsDataURL(file);
@@ -156,9 +188,10 @@
     document.getElementById('adminForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const mensajeDiv = document.getElementById('mensaje');
-      mensajeDiv.innerHTML = '<p style="text-align:center;">Registrando en PRODESEG S.A...</p>';
+      mensajeDiv.innerHTML = '<p style="text-align:center;">Validando credenciales y guardando...</p>';
 
       const payload = {
+        api_key: API_KEY,
         numero_guia: document.getElementById('guia').value,
         estado_envio: document.getElementById('estado').value,
         ubicacion: document.getElementById('ubicacion').value,
@@ -177,10 +210,10 @@
         const data = await res.json();
 
         if (res.ok && data.success) {
-          mensajeDiv.innerHTML = '<div class="alert alert-success">✅ Evento registrado exitosamente.</div>';
+          mensajeDiv.innerHTML = '<div class="alert alert-success">✅ Registro guardado exitosamente.</div>';
           document.getElementById('adminForm').reset();
           document.getElementById('previewImg').style.display = 'none';
-          document.getElementById('fotoEstado').innerText = "Captura directa desde la cámara del celular.";
+          document.getElementById('fotoEstado').innerText = "Captura directa desde la cámara.";
           fotoBase64 = null;
           enlaceGoogleMaps = null;
         } else {
@@ -190,6 +223,43 @@
         mensajeDiv.innerHTML = `<div class="alert alert-danger">❌ Error de conexión: ${err.message}</div>`;
       }
     });
+
+    async function exportarConsolidadoGeneral() {
+      try {
+        const res = await fetch('/api/reports/general');
+        const result = await res.json();
+
+        if (!res.ok || result.error || !result.data || result.data.length === 0) {
+          alert('No hay registros disponibles para exportar.');
+          return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+        csvContent += "Guia;Estado;Ubicacion;Notas;Fecha;Google_Maps;Tiene_Cumplido\n";
+
+        result.data.forEach(f => {
+          const guia = (f.guia || '').replace(/;/g, ',');
+          const estado = (f.estado_envio || '').replace(/;/g, ',');
+          const ubica = (f.ubicacion || '').replace(/;/g, ',');
+          const notas = (f.notas || '').replace(/;/g, ',').replace(/\n/g, ' ');
+          const fecha = f.fecha_reporte ? new Date(f.fecha_reporte).toLocaleString('es-CO') : '';
+          const maps = f.maps_url || '';
+          const tieneFoto = f.tiene_evidencia || 'NO';
+
+          csvContent += `"${guia}";"${estado}";"${ubica}";"${notas}";"${fecha}";"${maps}";"${tieneFoto}"\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `PRODESEG_Consolidado_General.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        alert('Error descargando el reporte: ' + err.message);
+      }
+    }
   </script>
 </body>
 </html>
