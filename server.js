@@ -1,6 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -33,6 +34,7 @@ function verificarApiKey(req, res, next) {
   next();
 }
 
+// Inicialización y sincronización de base de datos
 async function initDB() {
   try {
     await pool.query(`
@@ -51,6 +53,11 @@ async function initDB() {
   }
 }
 initDB();
+
+// GET: Cargar portal de clientes al ingresar a la raíz (https://proyecto-flota-okdm.onrender.com/)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'cliente.html'));
+});
 
 // GET: Consulta pública de trazabilidad por guía
 app.get('/api/tracking/:guia', async (req, res) => {
@@ -72,7 +79,7 @@ app.get('/api/tracking/:guia', async (req, res) => {
   }
 });
 
-// GET: Reporte general consolidado para Excel (Ligero, solo links)
+// GET: Reporte general consolidado para Excel (Ligero)
 app.get('/api/reports/general', async (req, res) => {
   try {
     const result = await pool.query(
@@ -102,6 +109,41 @@ app.post('/api/tracking', verificarApiKey, async (req, res) => {
     res.json({ meta: SYSTEM_META, success: true, message: 'Evento guardado exitosamente en PRODESEG S.A.' });
   } catch (err) {
     res.status(500).json({ meta: SYSTEM_META, error: err.message });
+  }
+});
+
+// GET: Indicadores de gestión para el Dashboard
+app.get('/api/dashboard', async (req, res) => {
+  try {
+    const query = `
+      WITH ultimos_estados AS (
+        SELECT DISTINCT ON (COALESCE(guia_transporte::TEXT, numero_guia::TEXT))
+               COALESCE(guia_transporte::TEXT, numero_guia::TEXT) AS guia,
+               estado_envio, fecha_reporte
+        FROM historial_trazabilidad
+        ORDER BY COALESCE(guia_transporte::TEXT, numero_guia::TEXT), fecha_reporte DESC
+      )
+      SELECT 
+        COUNT(*) AS total_guias,
+        COUNT(*) FILTER (WHERE estado_envio = 'ENTREGADO') AS entregados,
+        COUNT(*) FILTER (WHERE estado_envio = 'NOVEDAD') AS novedades,
+        COUNT(*) FILTER (WHERE estado_envio IN ('EN_BODEGA', 'DESPACHADO', 'EN_TRANSITO', 'EN_REPARTO')) AS en_proceso
+      FROM ultimos_estados;
+    `;
+    const result = await pool.query(query);
+    const row = result.rows[0];
+
+    res.json({
+      meta: SYSTEM_META,
+      metrics: {
+        total_guias: parseInt(row.total_guias) || 0,
+        entregados: parseInt(row.entregados) || 0,
+        novedades: parseInt(row.novedades) || 0,
+        en_proceso: parseInt(row.en_proceso) || 0
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ meta: SYSTEM_META, error: 'Error al calcular indicadores.' });
   }
 });
 
