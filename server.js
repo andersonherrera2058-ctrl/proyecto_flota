@@ -155,7 +155,7 @@ app.get('/api/dashboard', async (req, res) => {
         COUNT(*) AS total_guias,
         COUNT(*) FILTER (WHERE estado_envio = 'ENTREGADO') AS entregados,
         COUNT(*) FILTER (WHERE estado_envio = 'NOVEDAD') AS novedades,
-        COUNT(*) FILTER (WHERE estado_envio IN ('DESPACHADO', 'EN_TRANSITO', 'EN_REPARTO')) AS en_proceso
+        COUNT(*) FILTER (WHERE estado_envio IN ('EN_BODEGA', 'DESPACHADO', 'EN_TRANSITO', 'EN_REPARTO')) AS en_proceso
       FROM ultimos_estados;
     `;
 

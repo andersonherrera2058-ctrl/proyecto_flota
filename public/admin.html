@@ -42,6 +42,7 @@
       <div class="form-group">
         <label>Estado del Envío:</label>
         <select id="estado" required>
+          <option value="EN_BODEGA">EN BODEGA (PENDIENTE CEDI / CITA / FRECUENCIA)</option>
           <option value="DESPACHADO">DESPACHADO</option>
           <option value="EN_TRANSITO">EN TRÁNSITO</option>
           <option value="EN_REPARTO">EN REPARTO</option>
@@ -60,7 +61,7 @@
 
       <div class="form-group">
         <label>Notas u Observaciones:</label>
-        <textarea id="notas" rows="3" placeholder="Detalles de entrega, nombre de quien recibe o novedades..."></textarea>
+        <textarea id="notas" rows="3" placeholder="Detalles de entrega, razón de espera en CEDI, cita programada o novedades..."></textarea>
       </div>
 
       <div class="form-group">
@@ -102,7 +103,7 @@
       }
     }
 
-    // Compresión Inteligente con Canvas HD (Transforma fotos de 12MB en imágenes nítidas de 300KB)
+    // Compresión Inteligente con Canvas HD
     function procesarFotoOptimizada() {
       const file = document.getElementById('fotoInput').files[0];
       const estadoSpan = document.getElementById('fotoEstado');
@@ -117,7 +118,7 @@
 
         img.onload = function() {
           const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1400; // Ancho HD para máxima legibilidad de firmas/letras
+          const MAX_WIDTH = 1400;
           const MAX_HEIGHT = 1400;
           let width = img.width;
           let height = img.height;
@@ -140,7 +141,6 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Convertir a JPEG con compresión limpia del 85%
           fotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
 
           const preview = document.getElementById('previewImg');
