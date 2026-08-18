@@ -12,6 +12,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PRODESEG Envíos">
 
+  <!-- Librería cliente para generación de PDF nativo -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
     :root {
       --brand-gold: #a87b32;
@@ -100,6 +103,26 @@
       background-color: #8a6125;
     }
 
+    .btn-pdf {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(220, 53, 69, 0.2);
+    }
+
+    .btn-pdf:hover {
+      background-color: #bb2d3b;
+    }
+
     .btn-maps-amigable {
       display: inline-flex;
       align-items: center;
@@ -168,7 +191,7 @@
 </head>
 <body>
 
-  <div class="container">
+  <div class="container" id="reporteContenido">
     <div class="brand-header">
       <a href="/admin.html" class="brand-title-link" title="Acceso Interno">
         <h1 class="brand-title">🔥 PRODESEG S.A.</h1>
@@ -176,7 +199,7 @@
       <div class="brand-tagline">PROTECCIÓN CONTRA INCENDIOS Y SEGURIDAD INDUSTRIAL</div>
     </div>
     
-    <div class="search-box">
+    <div class="search-box" data-html2canvas-ignore="true">
       <input type="text" id="guiaInput" placeholder="Ej. PRO-001">
       <button class="btn-search" onclick="buscarGuia()">Consultar</button>
     </div>
@@ -184,11 +207,13 @@
     <div id="resultado"></div>
 
     <div class="footer-brand">
-      🌐 <strong>www.prodeseg.com.co</strong> | Consultas de Trazabilidad
+      🌐 <strong>www.prodeseg.com.co</strong> | Certificado Oficial de Trazabilidad
     </div>
   </div>
 
   <script>
+    let guiaActual = '';
+
     async function buscarGuia() {
       const guia = document.getElementById('guiaInput').value.trim();
       const resultadoDiv = document.getElementById('resultado');
@@ -198,6 +223,7 @@
         return;
       }
 
+      guiaActual = guia;
       resultadoDiv.innerHTML = '<p style="text-align:center; color:#73695f;">Consultando trazabilidad en la red PRODESEG S.A...</p>';
 
       try {
@@ -240,11 +266,27 @@
         });
         html += '</div>';
 
+        // Botón de descarga PDF de la guía consultada
+        html += `<button class="btn-pdf" data-html2canvas-ignore="true" onclick="descargarPDF()">📄 Descargar Certificado de Trazabilidad (PDF)</button>`;
+
         resultadoDiv.innerHTML = html;
 
       } catch (err) {
         resultadoDiv.innerHTML = `<div class="alert">Error de conexión: ${err.message}</div>`;
       }
+    }
+
+    function descargarPDF() {
+      const elemento = document.getElementById('reporteContenido');
+      const opciones = {
+        margin:       10,
+        filename:     `Trazabilidad_PRODESEG_${guiaActual}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opciones).from(elemento).save();
     }
   </script>
 </body>
