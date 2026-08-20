@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PRODESEG S.A. - Trazabilidad de Envíos</title>
   
   <!-- Configuración App Móvil PWA -->
@@ -12,10 +12,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PRODESEG Envíos">
 
-  <!-- Librería cliente para generación de PDF nativo -->
+  <!-- Librería para descarga de PDF nativo -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     :root {
       --brand-gold: #a87b32;
       --brand-dark: #2a2015;
@@ -31,14 +35,15 @@
       background-color: var(--bg-body);
       color: var(--text-main);
       margin: 0;
-      padding: 20px;
+      padding: 12px;
     }
 
     .container {
       max-width: 720px;
-      margin: 30px auto;
+      width: 100%;
+      margin: 15px auto;
       background: var(--card-bg);
-      padding: 35px;
+      padding: 24px 18px;
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(42, 32, 21, 0.08);
       border: 1px solid var(--border-color);
@@ -46,7 +51,7 @@
 
     .brand-header {
       text-align: center;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .brand-title-link {
@@ -54,30 +59,33 @@
     }
 
     .brand-title {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: 800;
       color: var(--brand-dark);
       margin: 0;
     }
 
     .brand-tagline {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--brand-gold);
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       margin-top: 6px;
       font-weight: 700;
     }
 
     .search-box {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
+      width: 100%;
     }
 
     input[type="text"] {
-      flex: 1;
-      padding: 14px 18px;
+      flex: 1 1 200px;
+      width: 100%;
+      padding: 12px 14px;
       border: 1.5px solid var(--border-color);
       border-radius: 10px;
       font-size: 1rem;
@@ -89,7 +97,9 @@
     }
 
     button.btn-search {
-      padding: 14px 24px;
+      flex: 0 0 auto;
+      width: 100%;
+      padding: 12px 20px;
       background-color: var(--brand-gold);
       color: white;
       border: none;
@@ -97,6 +107,12 @@
       font-size: 1rem;
       cursor: pointer;
       font-weight: 700;
+    }
+
+    @media (min-width: 480px) {
+      button.btn-search {
+        width: auto;
+      }
     }
 
     button.btn-search:hover {
@@ -144,23 +160,23 @@
 
     .timeline {
       position: relative;
-      padding-left: 25px;
+      padding-left: 20px;
       border-left: 3px solid var(--border-color);
       margin-top: 20px;
     }
 
     .timeline-event {
       position: relative;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     .timeline-event::before {
       content: '';
       position: absolute;
-      left: -32px;
+      left: -27px;
       top: 4px;
-      width: 12px;
-      height: 12px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
       background-color: var(--brand-gold);
       border: 3px solid white;
@@ -181,12 +197,12 @@
     .badge-warning { background-color: #fff3cd; color: #664d03; }
     .badge-danger { background-color: #f8d7da; color: #842029; }
 
-    .location { font-weight: 700; font-size: 1.05rem; color: var(--brand-dark); }
-    .notes { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
+    .location { font-weight: 700; font-size: 1rem; color: var(--brand-dark); word-break: break-word; }
+    .notes { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; word-break: break-word; }
     .date { font-size: 0.8rem; color: #9c9287; margin-top: 6px; }
-    .foto-cumplido { margin-top: 12px; max-width: 100%; max-height: 280px; border-radius: 10px; border: 1px solid var(--border-color); }
-    .alert { padding: 15px; background-color: #f8d7da; color: #842029; border-radius: 10px; text-align: center; font-weight: 600; }
-    .footer-brand { text-align: center; margin-top: 30px; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 15px; }
+    .foto-cumplido { margin-top: 12px; max-width: 100%; height: auto; max-height: 280px; border-radius: 10px; border: 1px solid var(--border-color); }
+    .alert { padding: 12px; background-color: #f8d7da; color: #842029; border-radius: 10px; text-align: center; font-weight: 600; font-size: 0.9rem; }
+    .footer-brand { text-align: center; margin-top: 25px; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 15px; }
   </style>
 </head>
 <body>
@@ -200,7 +216,7 @@
     </div>
     
     <div class="search-box" data-html2canvas-ignore="true">
-      <input type="text" id="guiaInput" placeholder="Ej. PRO-001">
+      <input type="text" id="guiaInput" placeholder="Ej. PRO-001 o 48600">
       <button class="btn-search" onclick="buscarGuia()">Consultar</button>
     </div>
 
@@ -228,10 +244,19 @@
 
       try {
         const response = await fetch(`/api/tracking/${guia}`);
+        
+        // Manejo seguro por si el servidor devuelve HTML o respuesta no válida en lugar de JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          // Si el servidor está despertando de suspensión en Render
+          resultadoDiv.innerHTML = '<div class="alert">El servidor se está reactivando. Por favor presiona "Consultar" nuevamente en 10 segundos.</div>';
+          return;
+        }
+
         const result = await response.json();
         const eventos = result.data || [];
 
-        if (eventos.length === 0) {
+        if (!response.ok || eventos.length === 0) {
           resultadoDiv.innerHTML = '<div class="alert">No se encontraron eventos registrados para esta guía.</div>';
           return;
         }
@@ -266,20 +291,20 @@
         });
         html += '</div>';
 
-        // Botón de descarga PDF de la guía consultada
+        // Botón para descarga de PDF
         html += `<button class="btn-pdf" data-html2canvas-ignore="true" onclick="descargarPDF()">📄 Descargar Certificado de Trazabilidad (PDF)</button>`;
 
         resultadoDiv.innerHTML = html;
 
       } catch (err) {
-        resultadoDiv.innerHTML = `<div class="alert">Error de conexión: ${err.message}</div>`;
+        resultadoDiv.innerHTML = `<div class="alert">Servidor iniciando o problema de conexión. Reintente en un momento.</div>`;
       }
     }
 
     function descargarPDF() {
       const elemento = document.getElementById('reporteContenido');
       const opciones = {
-        margin:       10,
+        margin:       8,
         filename:     `Trazabilidad_PRODESEG_${guiaActual}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true },
